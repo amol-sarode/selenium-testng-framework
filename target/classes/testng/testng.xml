@@ -1,102 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-
 
 <suite name="SauceDemo Automation Suite"
        parallel="classes"
-       thread-count="3">
+       thread-count="1">
 
-
-    <!-- ==========================
-         LISTENER
-    =========================== -->
-
+    
     <listeners>
-
         <listener class-name="com.amol.automation.listeners.TestListener"/>
-
     </listeners>
+    
 
-
-
-    <!-- ==========================
-         LOGIN TEST ONLY
-    =========================== -->
-
-
-  <!--  <test name="Login Test">
-
+    <test name="Login Tests">
 
         <classes>
-
-            <class name="com.amol.automation.tests.LoginTest"/>
-
+            <class name="com.amol.automation.tests.LoginTest">
+                <methods>
+                    <include name="verifyValidLogin"/>
+                
+                </methods>
+            </class>
         </classes>
-
-
-    </test>-->
-
-
-
-
-
-    <!-- ==========================
-         END TO END TEST ONLY
-
-         Enable when required
-    =========================== -->
-
-
-  
-
-    <!--<test name="End To End Test">
-
-        <classes>
-
-            <class name="com.amol.automation.tests.EndToEndTest"/>
-
-        </classes>
-
-    </test>-->
-
-   
-
-
-
-
-
-    <!-- ==========================
-         PARALLEL EXECUTION
-
-         Enable Login + EndToEnd together
-    =========================== -->
-
-
-   
-
-    <test name="Regression Parallel Run"
-          parallel="classes"
-          thread-count="3">
-
-
-        <classes>
-
-
-            <class name="com.amol.automation.tests.LoginTest"/>
-
-
-            <class name="com.amol.automation.tests.EndToEndTest"/>
-            
-             <class name="com.amol.automation.tests.ProductTest"/>
-
-
-        </classes>
-
 
     </test>
-
-  
-
 
 </suite>

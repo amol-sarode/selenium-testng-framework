@@ -13,8 +13,7 @@ import com.amol.automation.utils.LoggerUtils;
  */
 public class ProductPage extends BasePage {
 
-	private static final Logger log =
-			LoggerUtils.getLogger(ProductPage.class);
+	private static final Logger log = LoggerUtils.getLogger(ProductPage.class);
 
 	@FindBy(className = "title")
 	private WebElement productsTitle;

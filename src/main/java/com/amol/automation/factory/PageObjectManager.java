@@ -15,30 +15,15 @@ import com.amol.automation.pages.ProductPage;
  */
 public final class PageObjectManager {
 
-	private PageObjectManager() {
+	private PageObjectManager() {}
 
-	}
-
-	private static final ThreadLocal<LoginPage> loginPage =
-			new ThreadLocal<>();
-
-	private static final ThreadLocal<HomePage> homePage =
-			new ThreadLocal<>();
-
-	private static final ThreadLocal<ProductPage> productPage =
-			new ThreadLocal<>();
-
-	private static final ThreadLocal<CartPage> cartPage =
-			new ThreadLocal<>();
-
-	private static final ThreadLocal<CheckoutPage> checkoutPage =
-			new ThreadLocal<>();
-
-	private static final ThreadLocal<CheckoutOverviewPage> checkoutOverviewPage =
-			new ThreadLocal<>();
-
-	private static final ThreadLocal<CheckoutCompletePage> checkoutCompletePage =
-			new ThreadLocal<>();
+	private static final ThreadLocal<LoginPage> loginPage = new ThreadLocal<>();
+	private static final ThreadLocal<HomePage> homePage = new ThreadLocal<>();
+	private static final ThreadLocal<ProductPage> productPage = new ThreadLocal<>();
+	private static final ThreadLocal<CartPage> cartPage = new ThreadLocal<>();
+	private static final ThreadLocal<CheckoutPage> checkoutPage = new ThreadLocal<>();
+	private static final ThreadLocal<CheckoutOverviewPage> checkoutOverviewPage = new ThreadLocal<>();
+	private static final ThreadLocal<CheckoutCompletePage> checkoutCompletePage = new ThreadLocal<>();
 
 	public static LoginPage getLoginPage() {
 

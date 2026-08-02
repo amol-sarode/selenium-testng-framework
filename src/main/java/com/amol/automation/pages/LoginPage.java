@@ -3,6 +3,7 @@ package com.amol.automation.pages;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.testng.Reporter;
 
 import com.amol.automation.base.BasePage;
 import com.amol.automation.factory.PageObjectManager;
@@ -13,8 +14,7 @@ import com.amol.automation.utils.LoggerUtils;
  */
 public class LoginPage extends BasePage {
 
-	private static final Logger log =
-			LoggerUtils.getLogger(LoginPage.class);
+	private static final Logger log = LoggerUtils.getLogger(LoginPage.class);
 
 	@FindBy(id = "user-name")
 	private WebElement txtUsername;
@@ -34,22 +34,17 @@ public class LoginPage extends BasePage {
 	public LoginPage enterUsername(String username) {
 
 		log.info("Entering username : {}", username);
-
-		type(txtUsername, username);
-
+		enterText(txtUsername, username);
+		log.info("Successfully entered username : "+username);
 		return this;
-
 	}
 
 	/**
 	 * Enter password
 	 */
 	public LoginPage enterPassword(String password) {
-
 		log.info("Entering password");
-
-		type(txtPassword, password);
-
+		enterText(txtPassword, password);
 		return this;
 
 	}
@@ -73,13 +68,9 @@ public class LoginPage extends BasePage {
 	 * Login for invalid/locked user
 	 */
 	public LoginPage login(String username, String password) {
-
 		enterUsername(username);
-
 		enterPassword(password);
-
 		return clickLogin();
-
 	}
 
 	/**
@@ -88,9 +79,7 @@ public class LoginPage extends BasePage {
 	public HomePage loginSuccessfully(String username, String password) {
 
 		login(username, password);
-
 		log.info("Login successful");
-
 		return PageObjectManager.getHomePage();
 
 	}

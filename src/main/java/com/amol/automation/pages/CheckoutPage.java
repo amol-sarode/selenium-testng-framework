@@ -63,11 +63,11 @@ public class CheckoutPage extends BasePage {
         log.info("Entering checkout information");
 
 
-        type(firstName, fname);
+        enterText(firstName, fname);
 
-        type(lastName, lname);
+        enterText(lastName, lname);
 
-        type(postalCode, zip);
+        enterText(postalCode, zip);
 
 
         click(continueButton);

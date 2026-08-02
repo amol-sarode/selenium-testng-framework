@@ -12,8 +12,7 @@ import com.aventstack.extentreports.ExtentTest;
 
 public class TestListener implements ITestListener {
 
-	private static final Logger log =
-			LoggerUtils.getLogger(TestListener.class);
+	private static final Logger log = LoggerUtils.getLogger(TestListener.class);
 
 	@Override
 	public void onStart(ITestContext context) {
@@ -27,15 +26,11 @@ public class TestListener implements ITestListener {
 	@Override
 	public void onTestStart(ITestResult result) {
 
-		String testName =
-				result.getTestClass().getRealClass().getSimpleName()
-				+ "."
-				+ result.getMethod().getMethodName();
+		String testName = result.getTestClass().getRealClass().getSimpleName() + "."+ result.getMethod().getMethodName();
 
 		log.info("Starting Test : {}", testName);
 
 		ExtentReportManager.createTest(testName);
-
 		ExtentReportManager.getTest().info("Test Started : " + testName);
 
 	}
@@ -44,9 +39,7 @@ public class TestListener implements ITestListener {
 	public void onTestSuccess(ITestResult result) {
 
 		String testName = result.getMethod().getMethodName();
-
 		log.info("Test Passed : {}", testName);
-
 		ExtentTest test = ExtentReportManager.getTest();
 
 		if (test != null) {
@@ -60,21 +53,16 @@ public class TestListener implements ITestListener {
 	@Override
 	public void onTestFailure(ITestResult result) {
 
-		String testName =
-				result.getTestClass().getRealClass().getSimpleName()
-				+ "_"
-				+ result.getMethod().getMethodName();
+		String testName = result.getTestClass().getRealClass().getSimpleName() + "_"+ result.getMethod().getMethodName();
 
 		log.error("Test Failed : {}", testName);
-
 		ExtentTest test = ExtentReportManager.getTest();
 
 		String screenshotPath = null;
 
 		try {
 
-			screenshotPath =
-					ScreenshotUtils.captureScreenshot(testName);
+			screenshotPath = ScreenshotUtils.captureScreenshot(testName);
 
 		} catch (Exception e) {
 

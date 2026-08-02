@@ -14,7 +14,6 @@ public final class LoggerUtils {
 	public static Logger getLogger(Class<?> clazz) {
 
 		Objects.requireNonNull(clazz, "Logger class cannot be null");
-
 		return LogManager.getLogger(clazz);
 
 	}

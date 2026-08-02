@@ -6,9 +6,7 @@ package com.amol.automation.enums;
 public enum BrowserType {
 
 	CHROME,
-
 	FIREFOX,
-
 	EDGE;
 
 }

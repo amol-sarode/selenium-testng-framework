@@ -24,7 +24,6 @@ public class BaseTest {
 		DriverFactory.initializeDriver();
 
 		ConfigReader config = ConfigReader.getInstance();
-
 		String url = config.getProperty("app.url");
 
 		if (url == null || url.isEmpty()) {
