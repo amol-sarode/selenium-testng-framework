@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results ignored="0" total="5" passed="3" failed="2" skipped="0">
+  <reporter-output>
+  </reporter-output>
+  <suite started-at="2026-07-25T17:42:11 IST" name="SauceDemo Automation Suite" finished-at="2026-07-25T17:42:55 IST" duration-ms="44189">
+    <groups>
+      <group name="regression">
+        <method signature="EndToEndTest.verifyEndToEndPurchaseFlow()[pri:0, instance:com.amol.automation.tests.EndToEndTest@33aeca0b]" name="verifyEndToEndPurchaseFlow" class="com.amol.automation.tests.EndToEndTest"/>
+        <method signature="LoginTest.verifyInvalidLogin()[pri:0, instance:com.amol.automation.tests.LoginTest@435fb7b5]" name="verifyInvalidLogin" class="com.amol.automation.tests.LoginTest"/>
+        <method signature="LoginTest.verifyLockedUserLogin()[pri:0, instance:com.amol.automation.tests.LoginTest@435fb7b5]" name="verifyLockedUserLogin" class="com.amol.automation.tests.LoginTest"/>
+        <method signature="LoginTest.verifyValidLogin()[pri:0, instance:com.amol.automation.tests.LoginTest@435fb7b5]" name="verifyValidLogin" class="com.amol.automation.tests.LoginTest"/>
+        <method signature="ProductTest.verifyProductAddToCart()[pri:0, instance:com.amol.automation.tests.ProductTest@43aaf813]" name="verifyProductAddToCart" class="com.amol.automation.tests.ProductTest"/>
+      </group> <!-- regression -->
+      <group name="smoke">
+        <method signature="EndToEndTest.verifyEndToEndPurchaseFlow()[pri:0, instance:com.amol.automation.tests.EndToEndTest@33aeca0b]" name="verifyEndToEndPurchaseFlow" class="com.amol.automation.tests.EndToEndTest"/>
+        <method signature="LoginTest.verifyValidLogin()[pri:0, instance:com.amol.automation.tests.LoginTest@435fb7b5]" name="verifyValidLogin" class="com.amol.automation.tests.LoginTest"/>
+        <method signature="ProductTest.verifyProductAddToCart()[pri:0, instance:com.amol.automation.tests.ProductTest@43aaf813]" name="verifyProductAddToCart" class="com.amol.automation.tests.ProductTest"/>
+      </group> <!-- smoke -->
+    </groups>
+    <test started-at="2026-07-25T17:42:11 IST" name="Regression Parallel Run" finished-at="2026-07-25T17:42:55 IST" duration-ms="44189">
+      <class name="com.amol.automation.tests.EndToEndTest">
+        <test-method is-config="true" signature="setUp(java.lang.reflect.Method)[pri:0, instance:com.amol.automation.tests.EndToEndTest@33aeca0b]" started-at="2026-07-25T17:42:11 IST" name="setUp" finished-at="2026-07-25T17:42:20 IST" duration-ms="8775" status="PASS">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[public void com.amol.automation.tests.EndToEndTest.verifyEndToEndPurchaseFlow()]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setUp -->
+        <test-method signature="verifyEndToEndPurchaseFlow()[pri:0, instance:com.amol.automation.tests.EndToEndTest@33aeca0b]" started-at="2026-07-25T17:42:20 IST" name="verifyEndToEndPurchaseFlow" description="Verify complete purchase flow with valid user" finished-at="2026-07-25T17:42:54 IST" duration-ms="33634" status="FAIL">
+          <exception class="org.openqa.selenium.TimeoutException">
+            <message>
+              <![CDATA[Expected condition failed: waiting for visibility of Proxy element for: DefaultElementLocator 'By.className: shopping_cart_badge' (tried for 20 second(s) with 500 milliseconds interval)]]>
+            </message>
+            <full-stacktrace>
+              <![CDATA[org.openqa.selenium.TimeoutException: Expected condition failed: waiting for visibility of Proxy element for: DefaultElementLocator 'By.className: shopping_cart_badge' (tried for 20 second(s) with 500 milliseconds interval)
+at org.openqa.selenium.support.ui.WebDriverWait.timeoutException(WebDriverWait.java:84)
+at org.openqa.selenium.support.ui.FluentWait.until(FluentWait.java:228)
+at com.amol.automation.base.BasePage.getText(BasePage.java:104)
+at com.amol.automation.pages.ProductPage.getCartCount(ProductPage.java:62)
+at com.amol.automation.tests.EndToEndTest.verifyEndToEndPurchaseFlow(EndToEndTest.java:90)
+at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+at org.testng.internal.invokers.MethodInvocationHelper.invokeMethod(MethodInvocationHelper.java:139)
+at org.testng.internal.invokers.TestInvoker.invokeMethod(TestInvoker.java:664)
+at org.testng.internal.invokers.TestInvoker.invokeTestMethod(TestInvoker.java:227)
+at org.testng.internal.invokers.MethodRunner.runInSequence(MethodRunner.java:50)
+at org.testng.internal.invokers.TestInvoker$MethodInvocationAgent.invoke(TestInvoker.java:957)
+at org.testng.internal.invokers.TestInvoker.invokeTestMethods(TestInvoker.java:200)
+at org.testng.internal.invokers.TestMethodWorker.invokeTestMethods(TestMethodWorker.java:148)
+at org.testng.internal.invokers.TestMethodWorker.run(TestMethodWorker.java:128)
+at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+at java.base/java.lang.Thread.run(Thread.java:833)
+Caused by: org.openqa.selenium.NoSuchElementException: no such element: Unable to locate element: {"method":"css selector","selector":".shopping_cart_badge"}
+  (Session info: chrome=150.0.7871.182)
+For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception
+Build info: version: '4.20.0', revision: '866c76ca80'
+System info: os.name: 'Windows 10', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.1'
+Driver info: org.openqa.selenium.chrome.ChromeDriver
+Command: [430da6e24e2f79c9b2a4f1961a5f048a, findElement {value=shopping_cart_badge, using=class name}]
+Capabilities {acceptInsecureCerts: false, browserName: chrome, browserVersion: 150.0.7871.182, chrome: {chromedriverVersion: 150.0.7871.124 (9261fd0a595..., userDataDir: C:\WINDOWS\SystemTemp\scope...}, fedcm:accounts: true, goog:chromeOptions: {debuggerAddress: localhost:56105}, goog:processID: 16480, networkConnectionEnabled: false, pageLoadStrategy: normal, platformName: windows, proxy: Proxy(), se:cdp: ws://localhost:56105/devtoo..., se:cdpVersion: 150.0.7871.182, setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify, webauthn:extension:credBlob: true, webauthn:extension:largeBlob: true, webauthn:extension:minPinLength: true, webauthn:extension:prf: true, webauthn:virtualAuthenticators: true}
+Session ID: 430da6e24e2f79c9b2a4f1961a5f048a
+at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:77)
+at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:480)
+at org.openqa.selenium.remote.ErrorCodec.decode(ErrorCodec.java:167)
+at org.openqa.selenium.remote.codec.w3c.W3CHttpResponseCodec.decode(W3CHttpResponseCodec.java:138)
+at org.openqa.selenium.remote.codec.w3c.W3CHttpResponseCodec.decode(W3CHttpResponseCodec.java:50)
+at org.openqa.selenium.remote.HttpCommandExecutor.execute(HttpCommandExecutor.java:190)
+at org.openqa.selenium.remote.service.DriverCommandExecutor.invokeExecute(DriverCommandExecutor.java:216)
+at org.openqa.selenium.remote.service.DriverCommandExecutor.execute(DriverCommandExecutor.java:174)
+at org.openqa.selenium.remote.RemoteWebDriver.execute(RemoteWebDriver.java:518)
+at org.openqa.selenium.remote.ElementLocation$ElementFinder$2.findElement(ElementLocation.java:165)
+at org.openqa.selenium.remote.ElementLocation.findElement(ElementLocation.java:59)
+at org.openqa.selenium.remote.RemoteWebDriver.findElement(RemoteWebDriver.java:355)
+at org.openqa.selenium.remote.RemoteWebDriver.findElement(RemoteWebDriver.java:349)
+at org.openqa.selenium.support.pagefactory.DefaultElementLocator.findElement(DefaultElementLocator.java:68)
+at org.openqa.selenium.support.pagefactory.internal.LocatingElementHandler.invoke(LocatingElementHandler.java:38)
+at jdk.proxy2/jdk.proxy2.$Proxy28.isDisplayed(Unknown Source)
+at org.openqa.selenium.support.ui.ExpectedConditions.elementIfVisible(ExpectedConditions.java:304)
+at org.openqa.selenium.support.ui.ExpectedConditions$10.apply(ExpectedConditions.java:290)
+at org.openqa.selenium.support.ui.ExpectedConditions$10.apply(ExpectedConditions.java:287)
+at org.openqa.selenium.support.ui.FluentWait.until(FluentWait.java:203)
+... 18 more
+]]>
+            </full-stacktrace>
+          </exception> <!-- org.openqa.selenium.TimeoutException -->
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- verifyEndToEndPurchaseFlow -->
+        <test-method is-config="true" signature="tearDown()[pri:0, instance:com.amol.automation.tests.EndToEndTest@33aeca0b]" started-at="2026-07-25T17:42:54 IST" name="tearDown" finished-at="2026-07-25T17:42:55 IST" duration-ms="743" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- tearDown -->
+      </class> <!-- com.amol.automation.tests.EndToEndTest -->
+      <class name="com.amol.automation.tests.ProductTest">
+        <test-method is-config="true" signature="setUp(java.lang.reflect.Method)[pri:0, instance:com.amol.automation.tests.ProductTest@43aaf813]" started-at="2026-07-25T17:42:11 IST" name="setUp" finished-at="2026-07-25T17:42:20 IST" duration-ms="8635" status="PASS">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[public void com.amol.automation.tests.ProductTest.verifyProductAddToCart()]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setUp -->
+        <test-method signature="verifyProductAddToCart()[pri:0, instance:com.amol.automation.tests.ProductTest@43aaf813]" started-at="2026-07-25T17:42:20 IST" name="verifyProductAddToCart" description="Verify product add to cart with valid user" finished-at="2026-07-25T17:42:54 IST" duration-ms="34220" status="FAIL">
+          <exception class="org.openqa.selenium.TimeoutException">
+            <message>
+              <![CDATA[Expected condition failed: waiting for visibility of Proxy element for: DefaultElementLocator 'By.className: shopping_cart_badge' (tried for 20 second(s) with 500 milliseconds interval)]]>
+            </message>
+            <full-stacktrace>
+              <![CDATA[org.openqa.selenium.TimeoutException: Expected condition failed: waiting for visibility of Proxy element for: DefaultElementLocator 'By.className: shopping_cart_badge' (tried for 20 second(s) with 500 milliseconds interval)
+at org.openqa.selenium.support.ui.WebDriverWait.timeoutException(WebDriverWait.java:84)
+at org.openqa.selenium.support.ui.FluentWait.until(FluentWait.java:228)
+at com.amol.automation.base.BasePage.getText(BasePage.java:104)
+at com.amol.automation.pages.ProductPage.getCartCount(ProductPage.java:62)
+at com.amol.automation.tests.ProductTest.verifyProductAddToCart(ProductTest.java:57)
+at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+at org.testng.internal.invokers.MethodInvocationHelper.invokeMethod(MethodInvocationHelper.java:139)
+at org.testng.internal.invokers.TestInvoker.invokeMethod(TestInvoker.java:664)
+at org.testng.internal.invokers.TestInvoker.invokeTestMethod(TestInvoker.java:227)
+at org.testng.internal.invokers.MethodRunner.runInSequence(MethodRunner.java:50)
+at org.testng.internal.invokers.TestInvoker$MethodInvocationAgent.invoke(TestInvoker.java:957)
+at org.testng.internal.invokers.TestInvoker.invokeTestMethods(TestInvoker.java:200)
+at org.testng.internal.invokers.TestMethodWorker.invokeTestMethods(TestMethodWorker.java:148)
+at org.testng.internal.invokers.TestMethodWorker.run(TestMethodWorker.java:128)
+at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+at java.base/java.lang.Thread.run(Thread.java:833)
+Caused by: org.openqa.selenium.NoSuchElementException: no such element: Unable to locate element: {"method":"css selector","selector":".shopping_cart_badge"}
+  (Session info: chrome=150.0.7871.182)
+For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#no-such-element-exception
+Build info: version: '4.20.0', revision: '866c76ca80'
+System info: os.name: 'Windows 10', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.1'
+Driver info: org.openqa.selenium.chrome.ChromeDriver
+Command: [019920be813f79a17e1869965b9d7576, findElement {value=shopping_cart_badge, using=class name}]
+Capabilities {acceptInsecureCerts: false, browserName: chrome, browserVersion: 150.0.7871.182, chrome: {chromedriverVersion: 150.0.7871.124 (9261fd0a595..., userDataDir: C:\WINDOWS\SystemTemp\scope...}, fedcm:accounts: true, goog:chromeOptions: {debuggerAddress: localhost:56106}, goog:processID: 15612, networkConnectionEnabled: false, pageLoadStrategy: normal, platformName: windows, proxy: Proxy(), se:cdp: ws://localhost:56106/devtoo..., se:cdpVersion: 150.0.7871.182, setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify, webauthn:extension:credBlob: true, webauthn:extension:largeBlob: true, webauthn:extension:minPinLength: true, webauthn:extension:prf: true, webauthn:virtualAuthenticators: true}
+Session ID: 019920be813f79a17e1869965b9d7576
+at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:77)
+at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:480)
+at org.openqa.selenium.remote.ErrorCodec.decode(ErrorCodec.java:167)
+at org.openqa.selenium.remote.codec.w3c.W3CHttpResponseCodec.decode(W3CHttpResponseCodec.java:138)
+at org.openqa.selenium.remote.codec.w3c.W3CHttpResponseCodec.decode(W3CHttpResponseCodec.java:50)
+at org.openqa.selenium.remote.HttpCommandExecutor.execute(HttpCommandExecutor.java:190)
+at org.openqa.selenium.remote.service.DriverCommandExecutor.invokeExecute(DriverCommandExecutor.java:216)
+at org.openqa.selenium.remote.service.DriverCommandExecutor.execute(DriverCommandExecutor.java:174)
+at org.openqa.selenium.remote.RemoteWebDriver.execute(RemoteWebDriver.java:518)
+at org.openqa.selenium.remote.ElementLocation$ElementFinder$2.findElement(ElementLocation.java:165)
+at org.openqa.selenium.remote.ElementLocation.findElement(ElementLocation.java:59)
+at org.openqa.selenium.remote.RemoteWebDriver.findElement(RemoteWebDriver.java:355)
+at org.openqa.selenium.remote.RemoteWebDriver.findElement(RemoteWebDriver.java:349)
+at org.openqa.selenium.support.pagefactory.DefaultElementLocator.findElement(DefaultElementLocator.java:68)
+at org.openqa.selenium.support.pagefactory.internal.LocatingElementHandler.invoke(LocatingElementHandler.java:38)
+at jdk.proxy2/jdk.proxy2.$Proxy28.isDisplayed(Unknown Source)
+at org.openqa.selenium.support.ui.ExpectedConditions.elementIfVisible(ExpectedConditions.java:304)
+at org.openqa.selenium.support.ui.ExpectedConditions$10.apply(ExpectedConditions.java:290)
+at org.openqa.selenium.support.ui.ExpectedConditions$10.apply(ExpectedConditions.java:287)
+at org.openqa.selenium.support.ui.FluentWait.until(FluentWait.java:203)
+... 18 more
+]]>
+            </full-stacktrace>
+          </exception> <!-- org.openqa.selenium.TimeoutException -->
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- verifyProductAddToCart -->
+        <test-method is-config="true" signature="tearDown()[pri:0, instance:com.amol.automation.tests.ProductTest@43aaf813]" started-at="2026-07-25T17:42:54 IST" name="tearDown" finished-at="2026-07-25T17:42:55 IST" duration-ms="673" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- tearDown -->
+      </class> <!-- com.amol.automation.tests.ProductTest -->
+      <class name="com.amol.automation.tests.LoginTest">
+        <test-method is-config="true" signature="setUp(java.lang.reflect.Method)[pri:0, instance:com.amol.automation.tests.LoginTest@435fb7b5]" started-at="2026-07-25T17:42:11 IST" name="setUp" finished-at="2026-07-25T17:42:20 IST" duration-ms="9239" status="PASS">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[public void com.amol.automation.tests.LoginTest.verifyInvalidLogin()]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setUp -->
+        <test-method signature="verifyInvalidLogin()[pri:0, instance:com.amol.automation.tests.LoginTest@435fb7b5]" started-at="2026-07-25T17:42:20 IST" name="verifyInvalidLogin" description="Verify login with invalid credentials" finished-at="2026-07-25T17:42:23 IST" duration-ms="2122" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- verifyInvalidLogin -->
+        <test-method is-config="true" signature="tearDown()[pri:0, instance:com.amol.automation.tests.LoginTest@435fb7b5]" started-at="2026-07-25T17:42:23 IST" name="tearDown" finished-at="2026-07-25T17:42:23 IST" duration-ms="550" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- tearDown -->
+        <test-method is-config="true" signature="setUp(java.lang.reflect.Method)[pri:0, instance:com.amol.automation.tests.LoginTest@435fb7b5]" started-at="2026-07-25T17:42:23 IST" name="setUp" finished-at="2026-07-25T17:42:30 IST" duration-ms="6672" status="PASS">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[public void com.amol.automation.tests.LoginTest.verifyLockedUserLogin()]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setUp -->
+        <test-method signature="verifyLockedUserLogin()[pri:0, instance:com.amol.automation.tests.LoginTest@435fb7b5]" started-at="2026-07-25T17:42:30 IST" name="verifyLockedUserLogin" description="Verify login with locked user" finished-at="2026-07-25T17:42:31 IST" duration-ms="914" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- verifyLockedUserLogin -->
+        <test-method is-config="true" signature="tearDown()[pri:0, instance:com.amol.automation.tests.LoginTest@435fb7b5]" started-at="2026-07-25T17:42:31 IST" name="tearDown" finished-at="2026-07-25T17:42:31 IST" duration-ms="208" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- tearDown -->
+        <test-method is-config="true" signature="setUp(java.lang.reflect.Method)[pri:0, instance:com.amol.automation.tests.LoginTest@435fb7b5]" started-at="2026-07-25T17:42:31 IST" name="setUp" finished-at="2026-07-25T17:42:36 IST" duration-ms="5266" status="PASS">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[public void com.amol.automation.tests.LoginTest.verifyValidLogin()]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setUp -->
+        <test-method signature="verifyValidLogin()[pri:0, instance:com.amol.automation.tests.LoginTest@435fb7b5]" started-at="2026-07-25T17:42:36 IST" name="verifyValidLogin" description="Verify login with valid user" finished-at="2026-07-25T17:42:37 IST" duration-ms="1125" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- verifyValidLogin -->
+        <test-method is-config="true" signature="tearDown()[pri:0, instance:com.amol.automation.tests.LoginTest@435fb7b5]" started-at="2026-07-25T17:42:37 IST" name="tearDown" finished-at="2026-07-25T17:42:38 IST" duration-ms="354" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- tearDown -->
+      </class> <!-- com.amol.automation.tests.LoginTest -->
+    </test> <!-- Regression Parallel Run -->
+  </suite> <!-- SauceDemo Automation Suite -->
+</testng-results>
