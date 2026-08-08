@@ -1,105 +1,63 @@
 package com.amol.automation.pages;
 
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.testng.Reporter;
+import org.openqa.selenium.By;
 
-import com.amol.automation.base.BasePage;
-import com.amol.automation.factory.PageObjectManager;
+import com.amol.automation.reports.ExtentReportManager;
+import com.amol.automation.utils.ElementUtils;
 import com.amol.automation.utils.LoggerUtils;
 
-/**
- * Page Object class for SauceDemo Login Page.
- */
-public class LoginPage extends BasePage {
+public class LoginPage {
 
 	private static final Logger log = LoggerUtils.getLogger(LoginPage.class);
+	private final By txtUsername = By.id("user-name");
+	private final By txtPassword = By.id("password");
+	private final By btnLogin = By.id("login-button");
+	private final By errorMessage = By.xpath("//h3[@data-test='error']");
 
-	@FindBy(id = "user-name")
-	private WebElement txtUsername;
+	public void enterUsername(String username) {
 
-	@FindBy(id = "password")
-	private WebElement txtPassword;
-
-	@FindBy(id = "login-button")
-	private WebElement btnLogin;
-
-	@FindBy(xpath = "//h3[@data-test='error']")
-	private WebElement errorMessage;
-
-	/**
-	 * Enter username
-	 */
-	public LoginPage enterUsername(String username) {
-
-		log.info("Entering username : {}", username);
-		enterText(txtUsername, username);
-		log.info("Successfully entered username : "+username);
-		return this;
+		ElementUtils.enterText(txtUsername, username);
+		ExtentReportManager.info("Enter username : "+username);
+		log.info("Enter username : "+username);
 	}
 
-	/**
-	 * Enter password
-	 */
-	public LoginPage enterPassword(String password) {
-		log.info("Entering password");
-		enterText(txtPassword, password);
-		return this;
+	public void enterPassword(String password) {
 
+		ElementUtils.enterText(txtPassword, password);
+		ExtentReportManager.info("Enter password : "+password);
+		log.info("Enter password : "+password);
 	}
 
-	/**
-	 * Click Login button
-	 */
-	public LoginPage clickLogin() {
-
-		log.info("Clicking Login button");
-
-		click(btnLogin);
-
-		waitForPageLoad();
-
-		return this;
-
+	public void clickLogin() {
+		ElementUtils.click(btnLogin);
+		ExtentReportManager.info("Click Login button");
+		log.info("Click Login button");
 	}
 
-	/**
-	 * Login for invalid/locked user
-	 */
-	public LoginPage login(String username, String password) {
-		enterUsername(username);
-		enterPassword(password);
-		return clickLogin();
-	}
-
-	/**
-	 * Login for valid user
-	 */
-	public HomePage loginSuccessfully(String username, String password) {
-
-		login(username, password);
-		log.info("Login successful");
-		return PageObjectManager.getHomePage();
-
-	}
-
-	/**
-	 * Get error message
-	 */
-	public String getErrorMessage() {
-
-		return getText(errorMessage);
-
-	}
-
-	/**
-	 * Verify error displayed
-	 */
 	public boolean isErrorMessageDisplayed() {
 
-		return isDisplayed(errorMessage);
+		log.info("Checking whether error message is displayed");
+		ExtentReportManager.info("Verify error message is displayed");
+		boolean displayed = ElementUtils.isDisplayed(errorMessage);
 
+		if (displayed) {
+
+			ExtentReportManager.pass("Error message is displayed");
+
+		} else {
+
+			ExtentReportManager.fail("Error message is not displayed");
+		}
+
+		return displayed;
 	}
 
+	public String getErrorMessage() {
+
+		log.info("Getting error message");
+		String message = ElementUtils.getText(errorMessage);
+		ExtentReportManager.info("Error message : " + message);
+		return message;
+	}
 }

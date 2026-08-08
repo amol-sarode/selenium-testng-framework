@@ -1,77 +1,59 @@
 package com.amol.automation.pages;
 
-
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.By;
 
-import com.amol.automation.base.BasePage;
-import com.amol.automation.factory.PageObjectManager;
+import com.amol.automation.utils.ElementUtils;
 import com.amol.automation.utils.LoggerUtils;
-
 
 /**
  * Page Object class for SauceDemo Checkout Overview Page.
+ *
+ * Contains only locators and page-level methods.
  */
-public class CheckoutOverviewPage extends BasePage {
+public class CheckoutOverviewPage {
 
+	private static final Logger log = LoggerUtils.getLogger(CheckoutOverviewPage.class);
 
-    private static final Logger log =
-            LoggerUtils.getLogger(CheckoutOverviewPage.class);
+	// =========================================================
+	// Locators
+	// =========================================================
 
+	private final By overviewTitle = By.className("title");
 
+	private final By finishButton = By.id("finish");
 
-    @FindBy(className = "title")
-    private WebElement overviewTitle;
+	// =========================================================
+	// Page Methods
+	// =========================================================
 
+	/**
+	 * Get overview page title.
+	 */
+	public String getOverviewTitle() {
 
+		log.info("Getting checkout overview title");
 
-    @FindBy(id = "finish")
-    private WebElement finishButton;
+		return ElementUtils.getText(overviewTitle);
+	}
 
+	/**
+	 * Verify overview page displayed.
+	 */
+	public boolean isOverviewPageDisplayed() {
 
+		log.info("Checking checkout overview page");
 
-    /**
-     * Get overview page title
+		return ElementUtils.isDisplayed(overviewTitle);
+	}
+
+	/**
+     * Click Finish button.
      */
-    public String getOverviewTitle() {
-
-        log.info("Getting checkout overview title");
-
-        return getText(overviewTitle);
-
-    }
-
-
-
-    /**
-     * Verify overview page
-     */
-    public boolean isOverviewPageDisplayed() {
-
-        log.info("Checking checkout overview page");
-
-        return overviewTitle.isDisplayed();
-
-    }
-
-
-
-    /**
-     * Finish order and navigate to complete page
-     */
-    public CheckoutCompletePage clickFinish() {
-
+    public void clickFinish() {
 
         log.info("Clicking Finish button");
 
-
-        click(finishButton);
-
-
-        return PageObjectManager.getCheckoutCompletePage();
-
+        ElementUtils.click(finishButton);
     }
-
-
 }

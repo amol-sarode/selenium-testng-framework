@@ -1,31 +1,35 @@
 package com.amol.automation.pages;
 
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.By;
 
-import com.amol.automation.base.BasePage;
-import com.amol.automation.factory.PageObjectManager;
+import com.amol.automation.utils.ElementUtils;
 import com.amol.automation.utils.LoggerUtils;
 
 /**
  * Page Object class for SauceDemo Products Page.
+ *
+ * Contains only locators and page-level methods.
  */
-public class ProductPage extends BasePage {
+public class ProductPage {
 
 	private static final Logger log = LoggerUtils.getLogger(ProductPage.class);
 
-	@FindBy(className = "title")
-	private WebElement productsTitle;
+	// =========================================================
+	// Locators
+	// =========================================================
 
-	@FindBy(id = "add-to-cart-sauce-labs-backpack")
-	private WebElement addBackpackButton;
+	private final By productsTitle = By.className("title");
 
-	@FindBy(className = "shopping_cart_badge")
-	private WebElement cartBadge;
+	private final By addBackpackButton = By.id("add-to-cart-sauce-labs-backpack");
 
-	@FindBy(className = "shopping_cart_link")
-	private WebElement cartIcon;
+	private final By cartBadge = By.className("shopping_cart_badge");
+
+	private final By cartIcon = By.className("shopping_cart_link");
+
+	// =========================================================
+	// Page Methods
+	// =========================================================
 
 	/**
 	 * Get Products page title.
@@ -34,21 +38,17 @@ public class ProductPage extends BasePage {
 
 		log.info("Getting Products page title");
 
-		return getText(productsTitle);
-
+		return ElementUtils.getText(productsTitle);
 	}
 
 	/**
 	 * Add Sauce Labs Backpack to cart.
 	 */
-	public ProductPage addBackpack() {
+	public void addBackpack() {
 
 		log.info("Adding Sauce Labs Backpack to cart");
 
-		click(addBackpackButton);
-
-		return this;
-
+		ElementUtils.click(addBackpackButton);
 	}
 
 	/**
@@ -56,23 +56,18 @@ public class ProductPage extends BasePage {
 	 */
 	public String getCartCount() {
 
-		log.info("Getting cart count");
+		log.info("Getting cart badge count");
 
-		return getText(cartBadge);
-
+		return ElementUtils.getText(cartBadge);
 	}
 
 	/**
-	 * Open shopping cart.
-	 */
-	public CartPage clickCart() {
+     * Open shopping cart.
+     */
+    public void clickCart() {
 
-		log.info("Opening shopping cart");
+        log.info("Opening shopping cart");
 
-		click(cartIcon);
-
-		return PageObjectManager.getCartPage();
-
-	}
-
+        ElementUtils.click(cartIcon);
+    }
 }

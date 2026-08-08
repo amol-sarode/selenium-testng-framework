@@ -1,93 +1,71 @@
 package com.amol.automation.pages;
 
-
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.By;
 
-import com.amol.automation.base.BasePage;
-import com.amol.automation.factory.PageObjectManager;
+import com.amol.automation.utils.ElementUtils;
 import com.amol.automation.utils.LoggerUtils;
-
-
 
 /**
  * Page Object class for SauceDemo Checkout Complete Page.
+ *
+ * Contains only locators and page-level methods.
  */
-public class CheckoutCompletePage extends BasePage {
+public class CheckoutCompletePage {
 
+	private static final Logger log = LoggerUtils.getLogger(CheckoutCompletePage.class);
 
-    private static final Logger log =
-            LoggerUtils.getLogger(CheckoutCompletePage.class);
+	// =========================================================
+	// Locators
+	// =========================================================
 
+	private final By completeTitle = By.className("title");
 
+	private final By thankYouMessage = By.className("complete-header");
 
-    @FindBy(className = "title")
-    private WebElement completeTitle;
+	private final By backHomeButton = By.id("back-to-products");
 
+	// =========================================================
+	// Page Methods
+	// =========================================================
 
+	/**
+	 * Get complete page title.
+	 */
+	public String getCompletePageTitle() {
 
-    @FindBy(className = "complete-header")
-    private WebElement thankYouMessage;
+		log.info("Getting complete page title");
 
+		return ElementUtils.getText(completeTitle);
+	}
 
+	/**
+	 * Verify order complete page displayed.
+	 */
+	public boolean isOrderCompletePageDisplayed() {
 
-    @FindBy(id = "back-to-products")
-    private WebElement backHomeButton;
+		log.info("Checking order complete page");
 
+		return ElementUtils.isDisplayed(completeTitle);
+	}
 
+	/**
+	 * Get thank you message.
+	 */
+	public String getThankYouMessage() {
 
-    /**
-     * Get complete page title
+		log.info("Getting thank you message");
+
+		return ElementUtils.getText(thankYouMessage);
+	}
+
+	/**
+     * Click Back Home button.
      */
-    public String getCompletePageTitle() {
-
-        log.info("Getting complete page title");
-
-        return getText(completeTitle);
-
-    }
-
-
-
-    /**
-     * Verify order completion page
-     */
-    public boolean isOrderCompletePageDisplayed(){
-
-        log.info("Checking order complete page");
-
-        return completeTitle.isDisplayed();
-
-    }
-
-
-
-    /**
-     * Get thank you message
-     */
-    public String getThankYouMessage() {
-
-        log.info("Getting thank you message");
-
-        return getText(thankYouMessage);
-
-    }
-
-
-
-    /**
-     * Navigate back to products page
-     */
-    public ProductPage clickBackHome() {
+    public void clickBackHome() {
 
         log.info("Clicking Back Home button");
 
-        click(backHomeButton);
-
-        return PageObjectManager.getProductPage();
-
+        ElementUtils.click(backHomeButton);
     }
-
-
 }

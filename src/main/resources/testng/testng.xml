@@ -6,17 +6,24 @@
        thread-count="1">
 
     
-    <listeners>
+   <!-- <listeners>
         <listener class-name="com.amol.automation.listeners.TestListener"/>
-    </listeners>
+    </listeners>-->
     
 
     <test name="Login Tests">
 
         <classes>
-            <class name="com.amol.automation.tests.LoginTest">
+          <!--  <class name="com.amol.automation.tests.LoginTest">
                 <methods>
                     <include name="verifyValidLogin"/>
+                
+                </methods>
+            </class>-->
+            
+            <class name="com.amol.automation.tests.EndToEndTest">
+                <methods>
+                    <include name="verifyEndToEndPurchaseFlow"/>
                 
                 </methods>
             </class>

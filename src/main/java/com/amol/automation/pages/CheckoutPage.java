@@ -1,80 +1,85 @@
 package com.amol.automation.pages;
 
-
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.By;
 
-import com.amol.automation.base.BasePage;
-import com.amol.automation.factory.PageObjectManager;
+import com.amol.automation.utils.ElementUtils;
 import com.amol.automation.utils.LoggerUtils;
 
+/**
+ * Page Object class for SauceDemo Checkout Page.
+ *
+ * Contains only locators and page-level methods.
+ */
+public class CheckoutPage {
 
+	private static final Logger log = LoggerUtils.getLogger(CheckoutPage.class);
 
-public class CheckoutPage extends BasePage {
+	// =========================================================
+	// Locators
+	// =========================================================
 
+	private final By checkoutTitle = By.className("title");
 
-    private static final Logger log =
-            LoggerUtils.getLogger(CheckoutPage.class);
+	private final By firstName = By.id("first-name");
 
+	private final By lastName = By.id("last-name");
 
+	private final By postalCode = By.id("postal-code");
 
-    @FindBy(className = "title")
-    private WebElement checkoutTitle;
+	private final By continueButton = By.id("continue");
 
+	// =========================================================
+	// Page Methods
+	// =========================================================
 
+	/**
+	 * Get checkout page title.
+	 */
+	public String getCheckoutTitle() {
 
-    @FindBy(id = "first-name")
-    private WebElement firstName;
+		log.info("Getting checkout title");
 
+		return ElementUtils.getText(checkoutTitle);
+	}
 
+	/**
+	 * Enter first name.
+	 */
+	public void enterFirstName(String fname) {
 
-    @FindBy(id = "last-name")
-    private WebElement lastName;
+		log.info("Entering first name");
 
+		ElementUtils.enterText(firstName, fname);
+	}
 
+	/**
+	 * Enter last name.
+	 */
+	public void enterLastName(String lname) {
 
-    @FindBy(id = "postal-code")
-    private WebElement postalCode;
+		log.info("Entering last name");
 
+		ElementUtils.enterText(lastName, lname);
+	}
 
+	/**
+	 * Enter postal code.
+	 */
+	public void enterPostalCode(String zip) {
 
-    @FindBy(id = "continue")
-    private WebElement continueButton;
+		log.info("Entering postal code");
 
+		ElementUtils.enterText(postalCode, zip);
+	}
 
+	/**
+     * Click Continue button.
+     */
+    public void clickContinue() {
 
-    public String getCheckoutTitle() {
+        log.info("Clicking Continue button");
 
-        log.info("Getting checkout title");
-
-        return getText(checkoutTitle);
-
+        ElementUtils.click(continueButton);
     }
-
-
-
-    public CheckoutOverviewPage checkout(
-            String fname,
-            String lname,
-            String zip) {
-
-
-        log.info("Entering checkout information");
-
-
-        enterText(firstName, fname);
-
-        enterText(lastName, lname);
-
-        enterText(postalCode, zip);
-
-
-        click(continueButton);
-
-
-        return PageObjectManager.getCheckoutOverviewPage();
-
-    }
-
 }

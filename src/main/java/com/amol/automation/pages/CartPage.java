@@ -1,80 +1,61 @@
 package com.amol.automation.pages;
 
-
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.By;
 
-import com.amol.automation.base.BasePage;
-import com.amol.automation.factory.PageObjectManager;
+import com.amol.automation.utils.ElementUtils;
 import com.amol.automation.utils.LoggerUtils;
-
-
 
 /**
  * Page Object class for SauceDemo Cart Page.
+ *
+ * Contains only locators and page-level methods.
  */
-public class CartPage extends BasePage {
+public class CartPage {
 
+	private static final Logger log = LoggerUtils.getLogger(CartPage.class);
 
-    private static final Logger log =
-            LoggerUtils.getLogger(CartPage.class);
+	// =========================================================
+	// Locators
+	// =========================================================
 
+	private final By cartTitle = By.className("title");
 
+	private final By productName = By.className("inventory_item_name");
 
-    @FindBy(className = "title")
-    private WebElement cartTitle;
+	private final By checkoutButton = By.id("checkout");
 
+	// =========================================================
+	// Page Methods
+	// =========================================================
 
+	/**
+	 * Get cart title.
+	 */
+	public String getCartTitle() {
 
-    @FindBy(className = "inventory_item_name")
-    private WebElement productName;
+		log.info("Getting cart title");
 
+		return ElementUtils.getText(cartTitle);
+	}
 
+	/**
+	 * Get product name from cart.
+	 */
+	public String getProductName() {
 
-    @FindBy(id = "checkout")
-    private WebElement checkoutButton;
+		log.info("Getting product name");
 
+		return ElementUtils.getText(productName);
+	}
 
-
-    /**
-     * Get cart title
+	/**
+     * Click checkout button.
      */
-    public String getCartTitle() {
-
-        log.info("Getting cart title");
-
-        return getText(cartTitle);
-
-    }
-
-
-
-    /**
-     * Get product name from cart
-     */
-    public String getProductName() {
-
-        log.info("Getting product name");
-
-        return getText(productName);
-
-    }
-
-
-
-    /**
-     * Click checkout
-     */
-    public CheckoutPage clickCheckout() {
+    public void clickCheckout() {
 
         log.info("Clicking checkout button");
 
-        click(checkoutButton);
-
-        return PageObjectManager.getCheckoutPage();
-
+        ElementUtils.click(checkoutButton);
     }
-
-
 }

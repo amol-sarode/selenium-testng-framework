@@ -1,46 +1,54 @@
 package com.amol.automation.tests;
 
 import org.apache.logging.log4j.Logger;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.amol.automation.actions.ProductActions;
 import com.amol.automation.base.BaseTest;
-import com.amol.automation.factory.PageObjectManager;
-import com.amol.automation.pages.HomePage;
-import com.amol.automation.pages.ProductPage;
 import com.amol.automation.utils.LoggerUtils;
 
 public class ProductTest extends BaseTest {
 
-	private static final Logger log = LoggerUtils.getLogger(ProductTest.class);
+    private static final Logger log =
+            LoggerUtils.getLogger(ProductTest.class);
 
-	@Test(description = "Verify product add to cart with valid user", groups = { "smoke", "regression" })
-	public void verifyProductAddToCart() {
+    @Test(
+            description = "Verify product add to cart with valid user",
+            groups = {"smoke", "regression"}
+    )
+    public void verifyProductAddToCart() {
 
-		log.info("===== Product Test Started =====");
+        log.info("TEST STARTED : Verify Product Add To Cart");
 
-		String username = "standard_user";
-		String password = "secret_sauce";
-		log.info("Login with valid user : {}", username);
-		HomePage homePage = PageObjectManager.getLoginPage().loginSuccessfully(username, password);
-		Assert.assertTrue(homePage.isHomePageDisplayed(), "Products page is not displayed after login");
+        // =====================================================
+        // Create Parent Extent Test
+        // =====================================================
 
-		log.info("Login completed successfully");
+   
 
-		ProductPage productPage = PageObjectManager.getProductPage();
+        // =====================================================
+        // Test Data
+        // =====================================================
 
-		Assert.assertEquals(productPage.getProductsPageTitle(), "Products", "Products page title mismatch");
+        String username = "standard_user";
+        String password = "secret_sauce";
 
-		log.info("Products page verified");
+        // =====================================================
+        // Execute Business Flow
+        // =====================================================
 
-		productPage.addBackpack();
+        ProductActions productActions =
+                new ProductActions();
 
-		Assert.assertEquals(productPage.getCartCount(), "1", "Cart count not updated after adding product");
+        productActions.verifyProductAddToCart(
+                username,
+                password
+        );
 
-		log.info("Product added to cart successfully");
+        // =====================================================
+        // Test Completed
+        // =====================================================
 
-		log.info("===== Product Test Completed =====");
 
-	}
-
+    }
 }

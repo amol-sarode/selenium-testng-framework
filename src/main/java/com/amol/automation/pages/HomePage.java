@@ -1,57 +1,59 @@
 package com.amol.automation.pages;
 
-
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.By;
 
-import com.amol.automation.base.BasePage;
-import com.amol.automation.reports.ExtentReportManager;
+import com.amol.automation.utils.ElementUtils;
 import com.amol.automation.utils.LoggerUtils;
-import com.aventstack.extentreports.ExtentTest;
-
 
 /**
- * Page Object class for SauceDemo Products Page.
+ * Page Object class for SauceDemo Home/Products Page.
+ *
+ * Contains only locators and page-level methods.
  */
-public class HomePage extends BasePage {
+public class HomePage {
 
+	private static final Logger log = LoggerUtils.getLogger(HomePage.class);
 
-    private static final Logger log = LoggerUtils.getLogger(HomePage.class);
-	
-    @FindBy(className = "title")
-    private WebElement pageTitle;
-    @FindBy(id = "react-burger-menu-btn")
-    private WebElement menuButton;
+	// =========================================================
+	// Locators
+	// =========================================================
 
-    /**
-     * Verify Products page loaded
-     */
-    public boolean isHomePageDisplayed() {
-        log.info("Checking products page visibility");
-        return isDisplayed(pageTitle);
+	private final By pageTitle = By.className("title");
 
-    }
+	private final By menuButton = By.id("react-burger-menu-btn");
 
-    /**
-     * Get page title
-     */
-    public String getHomePageTitle() {
+	// =========================================================
+	// Page Methods
+	// =========================================================
 
+	/**
+	 * Verify Products page displayed.
+	 */
+	public boolean isHomePageDisplayed() {
 
-        log.info("Getting page title");
-        return getText(pageTitle);
+		log.info("Checking Products page visibility");
 
-    }
-    /**
-     * Verify menu button displayed
+		return ElementUtils.isDisplayed(pageTitle);
+	}
+
+	/**
+	 * Get Products page title.
+	 */
+	public String getHomePageTitle() {
+
+		log.info("Getting Products page title");
+
+		return ElementUtils.getText(pageTitle);
+	}
+
+	/**
+     * Verify menu button displayed.
      */
     public boolean isMenuDisplayed() {
 
-
         log.info("Checking menu visibility");
-        return isDisplayed(menuButton);
 
+        return ElementUtils.isDisplayed(menuButton);
     }
-
 }
