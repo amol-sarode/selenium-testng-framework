@@ -9,7 +9,7 @@ import com.amol.automation.utils.LoggerUtils;
 /**
  * Page Object class for SauceDemo Checkout Overview Page.
  *
- * Contains only locators and page-level methods.
+ * Contains only checkout overview locators and page-level methods.
  */
 public class CheckoutOverviewPage {
 
@@ -28,7 +28,9 @@ public class CheckoutOverviewPage {
 	// =========================================================
 
 	/**
-	 * Get overview page title.
+	 * Gets the checkout overview page title.
+	 *
+	 * @return overview page title
 	 */
 	public String getOverviewTitle() {
 
@@ -38,22 +40,24 @@ public class CheckoutOverviewPage {
 	}
 
 	/**
-	 * Verify overview page displayed.
+	 * Verifies that the checkout overview page is displayed.
+	 *
+	 * @return true if overview page is displayed
 	 */
 	public boolean isOverviewPageDisplayed() {
 
-		log.info("Checking checkout overview page");
+		log.info("Checking checkout overview page visibility");
 
 		return ElementUtils.isDisplayed(overviewTitle);
 	}
 
 	/**
-     * Click Finish button.
-     */
-    public void clickFinish() {
+	 * Clicks the Finish button.
+	 */
+	public void clickFinish() {
 
-        log.info("Clicking Finish button");
+		log.info("Clicking Finish button");
 
-        ElementUtils.click(finishButton);
-    }
+		ElementUtils.click(finishButton);
+	}
 }

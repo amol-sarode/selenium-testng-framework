@@ -9,7 +9,7 @@ import com.amol.automation.utils.LoggerUtils;
 /**
  * Page Object class for SauceDemo Cart Page.
  *
- * Contains only locators and page-level methods.
+ * Contains only cart-page locators and page-level methods.
  */
 public class CartPage {
 
@@ -30,32 +30,36 @@ public class CartPage {
 	// =========================================================
 
 	/**
-	 * Get cart title.
+	 * Gets the cart page title.
+	 *
+	 * @return cart page title
 	 */
 	public String getCartTitle() {
 
-		log.info("Getting cart title");
+		log.info("Getting cart page title");
 
 		return ElementUtils.getText(cartTitle);
 	}
 
 	/**
-	 * Get product name from cart.
+	 * Gets the product name displayed in the cart.
+	 *
+	 * @return product name
 	 */
 	public String getProductName() {
 
-		log.info("Getting product name");
+		log.info("Getting product name from cart");
 
 		return ElementUtils.getText(productName);
 	}
 
 	/**
-     * Click checkout button.
-     */
-    public void clickCheckout() {
+	 * Clicks the Checkout button.
+	 */
+	public void clickCheckout() {
 
-        log.info("Clicking checkout button");
+		log.info("Clicking Checkout button");
 
-        ElementUtils.click(checkoutButton);
-    }
+		ElementUtils.click(checkoutButton);
+	}
 }

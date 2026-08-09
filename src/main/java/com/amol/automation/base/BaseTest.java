@@ -13,9 +13,22 @@ import com.amol.automation.reports.ExtentReportManager;
 import com.amol.automation.utils.ConfigReader;
 import com.amol.automation.utils.LoggerUtils;
 
+/**
+ * Base class for all test classes.
+ *
+ * Responsibilities: - Initialize Extent Report - Initialize WebDriver - Open
+ * application URL - Cleanup page objects - Close WebDriver - Flush Extent
+ * Report
+ *
+ * Screenshot handling is completely managed by TestListener.
+ */
 public class BaseTest {
 
 	private static final Logger log = LoggerUtils.getLogger(BaseTest.class);
+
+	// =========================================================
+	// Suite Setup
+	// =========================================================
 
 	@BeforeSuite(alwaysRun = true)
 	public void startReport() {
@@ -24,6 +37,10 @@ public class BaseTest {
 
 		ExtentReportManager.initReports();
 	}
+
+	// =========================================================
+	// Test Setup
+	// =========================================================
 
 	@BeforeMethod(alwaysRun = true)
 	public void setUp() {
@@ -36,8 +53,7 @@ public class BaseTest {
 
 		String url = config.getProperty("app.url");
 
-		if (url == null || url.isEmpty()) {
-
+		if (url == null || url.trim().isEmpty()) {
 			throw new RuntimeException("Application URL is missing");
 		}
 
@@ -46,10 +62,21 @@ public class BaseTest {
 		DriverManager.getDriver().get(url);
 	}
 
+	// =========================================================
+	// Test Cleanup
+	// =========================================================
+
 	@AfterMethod(alwaysRun = true)
 	public void tearDown() {
 
-		log.info("Cleaning test execution");
+		log.info("========== Test Cleanup Started ==========");
+
+		/*
+		 * Screenshot is NOT captured here.
+		 *
+		 * TestListener captures the screenshot when the test fails, while the browser
+		 * is still open.
+		 */
 
 		PageObjectManager.unload();
 
@@ -59,6 +86,10 @@ public class BaseTest {
 
 		log.info("========== Test Execution Completed ==========");
 	}
+
+	// =========================================================
+	// Suite Cleanup
+	// =========================================================
 
 	@AfterSuite(alwaysRun = true)
 	public void finishReport() {

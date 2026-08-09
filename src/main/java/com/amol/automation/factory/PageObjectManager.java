@@ -8,103 +8,174 @@ import com.amol.automation.pages.HomePage;
 import com.amol.automation.pages.LoginPage;
 import com.amol.automation.pages.ProductPage;
 
+/**
+ * PageObjectManager
+ *
+ * Responsible for creating and managing Page Object instances.
+ *
+ * ThreadLocal is used so that every parallel test thread receives its own Page
+ * Object instances.
+ */
 public final class PageObjectManager {
 
 	private PageObjectManager() {
+		// Prevent object creation
 	}
 
-	private static final ThreadLocal<LoginPage> loginPage = new ThreadLocal<>();
+	// =========================================================
+	// Thread-Safe Page Objects
+	// =========================================================
 
-	private static final ThreadLocal<HomePage> homePage = new ThreadLocal<>();
+	private static final ThreadLocal<LoginPage> LOGIN_PAGE = new ThreadLocal<>();
 
-	private static final ThreadLocal<ProductPage> productPage = new ThreadLocal<>();
+	private static final ThreadLocal<HomePage> HOME_PAGE = new ThreadLocal<>();
 
-	private static final ThreadLocal<CartPage> cartPage = new ThreadLocal<>();
+	private static final ThreadLocal<ProductPage> PRODUCT_PAGE = new ThreadLocal<>();
 
-	private static final ThreadLocal<CheckoutPage> checkoutPage = new ThreadLocal<>();
+	private static final ThreadLocal<CartPage> CART_PAGE = new ThreadLocal<>();
 
-	private static final ThreadLocal<CheckoutOverviewPage> checkoutOverviewPage = new ThreadLocal<>();
+	private static final ThreadLocal<CheckoutPage> CHECKOUT_PAGE = new ThreadLocal<>();
 
-	private static final ThreadLocal<CheckoutCompletePage> checkoutCompletePage = new ThreadLocal<>();
+	private static final ThreadLocal<CheckoutOverviewPage> CHECKOUT_OVERVIEW_PAGE = new ThreadLocal<>();
 
+	private static final ThreadLocal<CheckoutCompletePage> CHECKOUT_COMPLETE_PAGE = new ThreadLocal<>();
+
+	// =========================================================
+	// Login Page
+	// =========================================================
+
+	/**
+	 * Returns LoginPage for the current thread.
+	 */
 	public static LoginPage getLoginPage() {
 
-		if (loginPage.get() == null) {
+		if (LOGIN_PAGE.get() == null) {
 
-			loginPage.set(new LoginPage());
+			LOGIN_PAGE.set(new LoginPage());
 		}
 
-		return loginPage.get();
+		return LOGIN_PAGE.get();
 	}
 
+	// =========================================================
+	// Home Page
+	// =========================================================
+
+	/**
+	 * Returns HomePage for the current thread.
+	 */
 	public static HomePage getHomePage() {
 
-		if (homePage.get() == null) {
+		if (HOME_PAGE.get() == null) {
 
-			homePage.set(new HomePage());
+			HOME_PAGE.set(new HomePage());
 		}
 
-		return homePage.get();
+		return HOME_PAGE.get();
 	}
 
+	// =========================================================
+	// Product Page
+	// =========================================================
+
+	/**
+	 * Returns ProductPage for the current thread.
+	 */
 	public static ProductPage getProductPage() {
 
-		if (productPage.get() == null) {
+		if (PRODUCT_PAGE.get() == null) {
 
-			productPage.set(new ProductPage());
+			PRODUCT_PAGE.set(new ProductPage());
 		}
 
-		return productPage.get();
+		return PRODUCT_PAGE.get();
 	}
 
+	// =========================================================
+	// Cart Page
+	// =========================================================
+
+	/**
+	 * Returns CartPage for the current thread.
+	 */
 	public static CartPage getCartPage() {
 
-		if (cartPage.get() == null) {
+		if (CART_PAGE.get() == null) {
 
-			cartPage.set(new CartPage());
+			CART_PAGE.set(new CartPage());
 		}
 
-		return cartPage.get();
+		return CART_PAGE.get();
 	}
 
+	// =========================================================
+	// Checkout Page
+	// =========================================================
+
+	/**
+	 * Returns CheckoutPage for the current thread.
+	 */
 	public static CheckoutPage getCheckoutPage() {
 
-		if (checkoutPage.get() == null) {
+		if (CHECKOUT_PAGE.get() == null) {
 
-			checkoutPage.set(new CheckoutPage());
+			CHECKOUT_PAGE.set(new CheckoutPage());
 		}
 
-		return checkoutPage.get();
+		return CHECKOUT_PAGE.get();
 	}
 
+	// =========================================================
+	// Checkout Overview Page
+	// =========================================================
+
+	/**
+	 * Returns CheckoutOverviewPage for the current thread.
+	 */
 	public static CheckoutOverviewPage getCheckoutOverviewPage() {
 
-		if (checkoutOverviewPage.get() == null) {
+		if (CHECKOUT_OVERVIEW_PAGE.get() == null) {
 
-			checkoutOverviewPage.set(new CheckoutOverviewPage());
+			CHECKOUT_OVERVIEW_PAGE.set(new CheckoutOverviewPage());
 		}
 
-		return checkoutOverviewPage.get();
+		return CHECKOUT_OVERVIEW_PAGE.get();
 	}
 
+	// =========================================================
+	// Checkout Complete Page
+	// =========================================================
+
+	/**
+	 * Returns CheckoutCompletePage for the current thread.
+	 */
 	public static CheckoutCompletePage getCheckoutCompletePage() {
 
-		if (checkoutCompletePage.get() == null) {
+		if (CHECKOUT_COMPLETE_PAGE.get() == null) {
 
-			checkoutCompletePage.set(new CheckoutCompletePage());
+			CHECKOUT_COMPLETE_PAGE.set(new CheckoutCompletePage());
 		}
 
-		return checkoutCompletePage.get();
+		return CHECKOUT_COMPLETE_PAGE.get();
 	}
 
+	// =========================================================
+	// Cleanup
+	// =========================================================
+
+	/**
+	 * Removes all Page Objects associated with the current thread.
+	 *
+	 * This should be called after test execution.
+	 */
 	public static void unload() {
 
-		loginPage.remove();
-		homePage.remove();
-		productPage.remove();
-		cartPage.remove();
-		checkoutPage.remove();
-		checkoutOverviewPage.remove();
-		checkoutCompletePage.remove();
+		LOGIN_PAGE.remove();
+		HOME_PAGE.remove();
+		PRODUCT_PAGE.remove();
+		CART_PAGE.remove();
+		CHECKOUT_PAGE.remove();
+		CHECKOUT_OVERVIEW_PAGE.remove();
+		CHECKOUT_COMPLETE_PAGE.remove();
 	}
 }

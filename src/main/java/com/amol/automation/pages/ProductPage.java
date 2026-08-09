@@ -9,7 +9,7 @@ import com.amol.automation.utils.LoggerUtils;
 /**
  * Page Object class for SauceDemo Products Page.
  *
- * Contains only locators and page-level methods.
+ * Contains only product-page locators and page-level methods.
  */
 public class ProductPage {
 
@@ -32,7 +32,9 @@ public class ProductPage {
 	// =========================================================
 
 	/**
-	 * Get Products page title.
+	 * Gets the Products page title.
+	 *
+	 * @return Products page title
 	 */
 	public String getProductsPageTitle() {
 
@@ -42,7 +44,7 @@ public class ProductPage {
 	}
 
 	/**
-	 * Add Sauce Labs Backpack to cart.
+	 * Adds Sauce Labs Backpack to the cart.
 	 */
 	public void addBackpack() {
 
@@ -52,7 +54,9 @@ public class ProductPage {
 	}
 
 	/**
-	 * Get cart badge count.
+	 * Gets the cart badge count.
+	 *
+	 * @return cart item count
 	 */
 	public String getCartCount() {
 
@@ -62,12 +66,12 @@ public class ProductPage {
 	}
 
 	/**
-     * Open shopping cart.
-     */
-    public void clickCart() {
+	 * Opens the shopping cart.
+	 */
+	public void clickCart() {
 
-        log.info("Opening shopping cart");
+		log.info("Opening shopping cart");
 
-        ElementUtils.click(cartIcon);
-    }
+		ElementUtils.click(cartIcon);
+	}
 }

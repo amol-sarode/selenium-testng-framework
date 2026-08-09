@@ -10,16 +10,24 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+/**
+ * Excel Utility class.
+ *
+ * Responsible for reading test data from Excel files.
+ */
 public final class ExcelUtils {
 
 	private ExcelUtils() {
-
 	}
 
 	private static final Logger log = LoggerUtils.getLogger(ExcelUtils.class);
 
 	/**
-	 * Reads test data from Excel.
+	 * Reads complete test data from an Excel sheet.
+	 *
+	 * The first row is treated as the header row.
+	 *
+	 * This method can be used when full Excel data is required.
 	 *
 	 * @param filePath  Excel file path
 	 * @param sheetName Excel sheet name
@@ -27,81 +35,221 @@ public final class ExcelUtils {
 	 */
 	public static Object[][] getTestData(String filePath, String sheetName) {
 
-		log.info("Reading Excel file : {}", filePath);
+		log.info("Reading Excel test data. File: {}, Sheet: {}", filePath, sheetName);
 
-		try (FileInputStream fis = new FileInputStream(new File(filePath));
+		validateFilePath(filePath);
+		validateSheetName(sheetName);
 
-				XSSFWorkbook workbook = new XSSFWorkbook(fis)) {
+		File file = new File(filePath);
+
+		if (!file.exists()) {
+			throw new RuntimeException("Excel file not found: " + filePath);
+		}
+
+		try (FileInputStream fis = new FileInputStream(file); XSSFWorkbook workbook = new XSSFWorkbook(fis)) {
 
 			XSSFSheet sheet = workbook.getSheet(sheetName);
 
 			if (sheet == null) {
-				throw new RuntimeException("Sheet '" + sheetName + "' not found.");
+				throw new RuntimeException("Excel sheet not found: " + sheetName);
 			}
-
-			DataFormatter formatter = new DataFormatter();
 
 			Row headerRow = sheet.getRow(0);
 
 			if (headerRow == null) {
-				throw new RuntimeException("Excel header row is missing");
+				throw new RuntimeException("Excel header row is missing: " + sheetName);
 			}
 
-			int cols = headerRow.getPhysicalNumberOfCells();
+			int columnCount = headerRow.getLastCellNum();
+
+			if (columnCount <= 0) {
+				throw new RuntimeException("Excel sheet does not contain any columns: " + sheetName);
+			}
+
+			DataFormatter formatter = new DataFormatter();
 
 			int lastRow = sheet.getLastRowNum();
+			int validRowCount = 0;
 
-			int validRows = 0;
+			for (int rowIndex = 1; rowIndex <= lastRow; rowIndex++) {
 
-			// Count valid rows
-			for (int i = 1; i <= lastRow; i++) {
+				Row row = sheet.getRow(rowIndex);
 
-				Row row = sheet.getRow(i);
-
-				if (row != null && row.getCell(0) != null
-						&& !formatter.formatCellValue(row.getCell(0)).trim().isEmpty()) {
-
-					validRows++;
+				if (isValidRow(row, formatter)) {
+					validRowCount++;
 				}
 			}
 
-			Object[][] data = new Object[validRows][cols];
+			if (validRowCount == 0) {
 
-			int index = 0;
+				log.warn("No valid test data found in Excel. Sheet: {}", sheetName);
 
-			// Read Excel data
-			for (int i = 1; i <= lastRow; i++) {
+				return new Object[0][columnCount];
+			}
 
-				Row row = sheet.getRow(i);
+			Object[][] testData = new Object[validRowCount][columnCount];
 
-				if (row != null && row.getCell(0) != null
-						&& !formatter.formatCellValue(row.getCell(0)).trim().isEmpty()) {
+			int dataIndex = 0;
 
-					for (int j = 0; j < cols; j++) {
+			for (int rowIndex = 1; rowIndex <= lastRow; rowIndex++) {
 
-						if (row.getCell(j) != null) {
+				Row row = sheet.getRow(rowIndex);
 
-							data[index][j] = formatter.formatCellValue(row.getCell(j));
+				if (!isValidRow(row, formatter)) {
+					continue;
+				}
 
-						} else {
+				for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
 
-							data[index][j] = "";
-						}
+					if (row.getCell(columnIndex) != null) {
+
+						testData[dataIndex][columnIndex] = formatter.formatCellValue(row.getCell(columnIndex)).trim();
+
+					} else {
+
+						testData[dataIndex][columnIndex] = "";
 					}
-
-					index++;
 				}
+
+				dataIndex++;
 			}
 
-			log.info("Excel data loaded successfully. Total records : {}", validRows);
+			log.info("Excel test data loaded successfully. " + "Records: {}, Columns: {}", validRowCount, columnCount);
 
-			return data;
+			return testData;
 
 		} catch (IOException e) {
 
-			log.error("Unable to read Excel file", e);
+			log.error("Unable to read Excel file: {}", filePath, e);
 
-			throw new RuntimeException("Unable to read Excel file : " + filePath, e);
+			throw new RuntimeException("Unable to read Excel file: " + filePath, e);
 		}
 	}
+
+	/**
+	 * Reads a specific data row from an Excel sheet.
+	 *
+	 * Row 0 is the header row.
+	 *
+	 * Therefore:
+	 *
+	 * row 1 = first data row row 2 = second data row row 3 = third data row
+	 *
+	 * @param filePath  Excel file path
+	 * @param sheetName Excel sheet name
+	 * @param dataRow   Excel data row number
+	 * @return selected row data as String[]
+	 */
+	public static String[] getRowData(String filePath, String sheetName, int dataRow) {
+
+		log.info("Reading Excel row. File: {}, Sheet: {}, Row: {}", filePath, sheetName, dataRow);
+
+		validateFilePath(filePath);
+		validateSheetName(sheetName);
+
+		if (dataRow < 1) {
+			throw new IllegalArgumentException("Data row must be greater than or equal to 1");
+		}
+
+		File file = new File(filePath);
+
+		if (!file.exists()) {
+			throw new RuntimeException("Excel file not found: " + filePath);
+		}
+
+		try (FileInputStream fis = new FileInputStream(file); XSSFWorkbook workbook = new XSSFWorkbook(fis)) {
+
+			XSSFSheet sheet = workbook.getSheet(sheetName);
+
+			if (sheet == null) {
+				throw new RuntimeException("Excel sheet not found: " + sheetName);
+			}
+
+			Row headerRow = sheet.getRow(0);
+
+			if (headerRow == null) {
+				throw new RuntimeException("Excel header row is missing: " + sheetName);
+			}
+
+			int columnCount = headerRow.getLastCellNum();
+
+			if (columnCount <= 0) {
+				throw new RuntimeException("Excel sheet does not contain any columns: " + sheetName);
+			}
+
+			Row row = sheet.getRow(dataRow);
+
+			if (row == null) {
+				throw new RuntimeException("Excel data row not found: " + dataRow);
+			}
+
+			DataFormatter formatter = new DataFormatter();
+
+			if (!isValidRow(row, formatter)) {
+				throw new RuntimeException("Excel data row is empty or invalid: " + dataRow);
+			}
+
+			String[] rowData = new String[columnCount];
+
+			for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+
+				if (row.getCell(columnIndex) != null) {
+
+					rowData[columnIndex] = formatter.formatCellValue(row.getCell(columnIndex)).trim();
+
+				} else {
+
+					rowData[columnIndex] = "";
+				}
+			}
+
+			log.info("Excel row loaded successfully. " + "Row: {}, Columns: {}", dataRow, columnCount);
+
+			return rowData;
+
+		} catch (IOException e) {
+
+			log.error("Unable to read Excel file: {}", filePath, e);
+
+			throw new RuntimeException("Unable to read Excel file: " + filePath, e);
+		}
+	}
+
+	/**
+	 * Checks whether an Excel row contains valid data.
+	 *
+	 * The first column is used to determine validity.
+	 */
+	private static boolean isValidRow(Row row, DataFormatter formatter) {
+
+		if (row == null || row.getCell(0) == null) {
+			return false;
+		}
+
+		return !formatter.formatCellValue(row.getCell(0)).trim().isEmpty();
+	}
+
+	/**
+	 * Validates Excel file path.
+	 */
+	private static void validateFilePath(String filePath) {
+
+		if (filePath == null || filePath.trim().isEmpty()) {
+
+			throw new IllegalArgumentException("Excel file path cannot be null or empty");
+		}
+	}
+
+	/**
+     * Validates Excel sheet name.
+     */
+    private static void validateSheetName(String sheetName) {
+
+        if (sheetName == null || sheetName.trim().isEmpty()) {
+
+            throw new IllegalArgumentException(
+                    "Excel sheet name cannot be null or empty"
+            );
+        }
+    }
 }

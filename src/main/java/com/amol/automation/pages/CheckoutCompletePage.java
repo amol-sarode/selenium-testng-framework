@@ -9,7 +9,7 @@ import com.amol.automation.utils.LoggerUtils;
 /**
  * Page Object class for SauceDemo Checkout Complete Page.
  *
- * Contains only locators and page-level methods.
+ * Contains only checkout completion locators and page-level methods.
  */
 public class CheckoutCompletePage {
 
@@ -30,42 +30,48 @@ public class CheckoutCompletePage {
 	// =========================================================
 
 	/**
-	 * Get complete page title.
+	 * Gets the checkout complete page title.
+	 *
+	 * @return complete page title
 	 */
 	public String getCompletePageTitle() {
 
-		log.info("Getting complete page title");
+		log.info("Getting checkout complete page title");
 
 		return ElementUtils.getText(completeTitle);
 	}
 
 	/**
-	 * Verify order complete page displayed.
+	 * Verifies that the order completion page is displayed.
+	 *
+	 * @return true if completion page is displayed
 	 */
 	public boolean isOrderCompletePageDisplayed() {
 
-		log.info("Checking order complete page");
+		log.info("Checking checkout complete page visibility");
 
 		return ElementUtils.isDisplayed(completeTitle);
 	}
 
 	/**
-	 * Get thank you message.
+	 * Gets the thank-you message displayed after order completion.
+	 *
+	 * @return thank-you message
 	 */
 	public String getThankYouMessage() {
 
-		log.info("Getting thank you message");
+		log.info("Getting thank-you message");
 
 		return ElementUtils.getText(thankYouMessage);
 	}
 
 	/**
-     * Click Back Home button.
-     */
-    public void clickBackHome() {
+	 * Clicks the Back Home button.
+	 */
+	public void clickBackHome() {
 
-        log.info("Clicking Back Home button");
+		log.info("Clicking Back Home button");
 
-        ElementUtils.click(backHomeButton);
-    }
+		ElementUtils.click(backHomeButton);
+	}
 }

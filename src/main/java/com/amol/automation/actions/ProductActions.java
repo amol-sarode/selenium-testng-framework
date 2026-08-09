@@ -3,128 +3,111 @@ package com.amol.automation.actions;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
 
+import com.amol.automation.factory.ActionObjectManager;
 import com.amol.automation.factory.PageObjectManager;
 import com.amol.automation.pages.HomePage;
-import com.amol.automation.pages.LoginPage;
 import com.amol.automation.pages.ProductPage;
 import com.amol.automation.reports.ExtentReportManager;
 import com.amol.automation.utils.LoggerUtils;
 import com.aventstack.extentreports.ExtentTest;
 
+/**
+ * Business actions for Product functionality.
+ *
+ * Handles the product add-to-cart business flow.
+ */
 public class ProductActions {
 
 	private static final Logger log = LoggerUtils.getLogger(ProductActions.class);
 
-	// =========================================================
-	// Page Objects
-	// =========================================================
-
-	private final LoginPage loginPage;
 	private final HomePage homePage;
 	private final ProductPage productPage;
+	private final LoginActions loginActions;
 
-	// =========================================================
-	// Constructor
-	// =========================================================
-
+	/**
+	 * Initializes required Page Objects and Actions.
+	 */
 	public ProductActions() {
 
-		loginPage = PageObjectManager.getLoginPage();
 		homePage = PageObjectManager.getHomePage();
+
 		productPage = PageObjectManager.getProductPage();
+
+		loginActions = ActionObjectManager.getLoginActions();
 	}
 
-	// =========================================================
-	// Product Business Flow
-	// =========================================================
-
+	/**
+	 * Verifies that a valid user can login and add a product to the cart.
+	 *
+	 * @param username valid username
+	 * @param password valid password
+	 */
 	public void verifyProductAddToCart(String username, String password) {
 
 		ExtentTest productNode = ExtentReportManager.createNode("Product Add To Cart Flow");
 
-		try {
+		productNode.info("[===== Product Flow Started =====]");
 
-			productNode.info("[===== Product Flow Started =====]");
+		log.info("===== Product Flow Started =====");
 
-			log.info("===== Product Flow Started =====");
+		// =====================================================
+		// Login
+		// =====================================================
 
-			// =================================================
-			// Login
-			// =================================================
+		ExtentTest loginNode = productNode.createNode("Login");
 
-			ExtentTest loginNode = productNode.createNode("Login");
+		loginActions.login(username, password);
 
-			loginNode.info("Login with valid user : " + username);
+		loginNode.pass("Login completed successfully");
 
-			loginPage.enterUsername(username);
+		loginNode.info("Verify Products page is displayed");
 
-			loginNode.pass("Username entered successfully");
+		Assert.assertTrue(homePage.isHomePageDisplayed(), "Products page is not displayed after login");
 
-			loginPage.enterPassword(password);
+		loginNode.pass("Products page displayed successfully");
 
-			loginNode.pass("Password entered successfully");
+		log.info("Login completed successfully");
 
-			loginPage.clickLogin();
+		// =====================================================
+		// Product Page Verification
+		// =====================================================
 
-			loginNode.pass("Login button clicked successfully");
+		ExtentTest productPageNode = productNode.createNode("Product Page Verification");
 
-			// =================================================
-			// Verify Home Page
-			// =================================================
+		productPageNode.info("Verify Products page title");
 
-			loginNode.info("Verify Products page is displayed");
+		Assert.assertEquals(productPage.getProductsPageTitle(), "Products", "Products page title mismatch");
 
-			Assert.assertTrue(homePage.isHomePageDisplayed(), "Products page is not displayed after login");
+		productPageNode.pass("Products page title verified successfully");
 
-			loginNode.pass("Products page displayed successfully");
+		log.info("Products page verified successfully");
 
-			log.info("Login completed successfully");
+		// =====================================================
+		// Add Product To Cart
+		// =====================================================
 
-			// =================================================
-			// Product Page
-			// =================================================
+		ExtentTest addProductNode = productNode.createNode("Add Product To Cart");
 
-			ExtentTest productPageNode = productNode.createNode("Product Page Verification");
+		addProductNode.info("Add Sauce Labs Backpack to cart");
 
-			productPageNode.info("Verify Products page title");
+		productPage.addBackpack();
 
-			Assert.assertEquals(productPage.getProductsPageTitle(), "Products", "Products page title mismatch");
+		addProductNode.pass("Sauce Labs Backpack added successfully");
 
-			productPageNode.pass("Products page title verified successfully");
+		// =====================================================
+		// Verify Cart Count
+		// =====================================================
 
-			log.info("Products page verified");
+		addProductNode.info("Verify cart count");
 
-			// =================================================
-			// Add Product
-			// =================================================
+		Assert.assertEquals(productPage.getCartCount(), "1", "Cart count not updated after adding product");
 
-			ExtentTest addProductNode = productNode.createNode("Add Product To Cart");
+		addProductNode.pass("Cart count verified as 1");
 
-			addProductNode.info("Add Sauce Labs Backpack to cart");
+		productNode.pass("[===== Product Flow Completed Successfully =====]");
 
-			productPage.addBackpack();
+		log.info("Product added to cart successfully");
 
-			addProductNode.pass("Sauce Labs Backpack added successfully");
-
-			addProductNode.info("Verify cart count");
-
-			Assert.assertEquals(productPage.getCartCount(), "1", "Cart count not updated after adding product");
-
-			addProductNode.pass("Cart count verified as 1");
-
-			productNode.pass("[===== Product Flow Completed Successfully =====]");
-
-			log.info("Product added to cart successfully");
-
-			log.info("===== Product Flow Completed =====");
-
-		} catch (Exception e) {
-
-			productNode.fail("Product flow failed : " + e.getMessage());
-
-			log.error("Product flow failed", e);
-
-			throw e;
-		}
+		log.info("===== Product Flow Completed =====");
 	}
 }

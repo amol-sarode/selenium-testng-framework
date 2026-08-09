@@ -7,9 +7,9 @@ import com.amol.automation.utils.ElementUtils;
 import com.amol.automation.utils.LoggerUtils;
 
 /**
- * Page Object class for SauceDemo Checkout Page.
+ * Page Object class for SauceDemo Checkout Information Page.
  *
- * Contains only locators and page-level methods.
+ * Contains only checkout-page locators and page-level methods.
  */
 public class CheckoutPage {
 
@@ -34,17 +34,21 @@ public class CheckoutPage {
 	// =========================================================
 
 	/**
-	 * Get checkout page title.
+	 * Gets the checkout page title.
+	 *
+	 * @return checkout page title
 	 */
 	public String getCheckoutTitle() {
 
-		log.info("Getting checkout title");
+		log.info("Getting checkout page title");
 
 		return ElementUtils.getText(checkoutTitle);
 	}
 
 	/**
-	 * Enter first name.
+	 * Enters first name.
+	 *
+	 * @param fname first name
 	 */
 	public void enterFirstName(String fname) {
 
@@ -54,7 +58,9 @@ public class CheckoutPage {
 	}
 
 	/**
-	 * Enter last name.
+	 * Enters last name.
+	 *
+	 * @param lname last name
 	 */
 	public void enterLastName(String lname) {
 
@@ -64,7 +70,9 @@ public class CheckoutPage {
 	}
 
 	/**
-	 * Enter postal code.
+	 * Enters postal code.
+	 *
+	 * @param zip postal code
 	 */
 	public void enterPostalCode(String zip) {
 
@@ -74,12 +82,12 @@ public class CheckoutPage {
 	}
 
 	/**
-     * Click Continue button.
-     */
-    public void clickContinue() {
+	 * Clicks Continue button.
+	 */
+	public void clickContinue() {
 
-        log.info("Clicking Continue button");
+		log.info("Clicking Continue button");
 
-        ElementUtils.click(continueButton);
-    }
+		ElementUtils.click(continueButton);
+	}
 }

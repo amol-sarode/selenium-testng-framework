@@ -9,7 +9,7 @@ import com.amol.automation.utils.LoggerUtils;
 /**
  * Page Object class for SauceDemo Home/Products Page.
  *
- * Contains only locators and page-level methods.
+ * Contains only page locators and page-level methods.
  */
 public class HomePage {
 
@@ -28,7 +28,9 @@ public class HomePage {
 	// =========================================================
 
 	/**
-	 * Verify Products page displayed.
+	 * Verifies that the Products page is displayed.
+	 *
+	 * @return true if Products page title is visible
 	 */
 	public boolean isHomePageDisplayed() {
 
@@ -38,7 +40,9 @@ public class HomePage {
 	}
 
 	/**
-	 * Get Products page title.
+	 * Gets the Products page title.
+	 *
+	 * @return page title
 	 */
 	public String getHomePageTitle() {
 
@@ -48,12 +52,14 @@ public class HomePage {
 	}
 
 	/**
-     * Verify menu button displayed.
-     */
-    public boolean isMenuDisplayed() {
+	 * Verifies that the menu button is displayed.
+	 *
+	 * @return true if menu button is visible
+	 */
+	public boolean isMenuDisplayed() {
 
-        log.info("Checking menu visibility");
+		log.info("Checking menu visibility");
 
-        return ElementUtils.isDisplayed(menuButton);
-    }
+		return ElementUtils.isDisplayed(menuButton);
+	}
 }
