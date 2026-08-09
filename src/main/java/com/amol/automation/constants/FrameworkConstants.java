@@ -27,8 +27,10 @@ public final class FrameworkConstants {
 
 	public static final String EXCEL_FILE = TEST_DATA_FOLDER + "LoginData.xlsx";
 
+	public static final String LOGIN_SHEET = "LoginData";
+
 	public static final String USERS_JSON = TEST_DATA_FOLDER + "Users.json";
 
-	public static final String PRODUCT_JSON = TEST_DATA_FOLDER + "ProductData.json";
-
+	public static final String PRODUCT_JSON =
+            TEST_DATA_FOLDER + "ProductData.json";
 }
