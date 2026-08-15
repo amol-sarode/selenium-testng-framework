@@ -1,7 +1,6 @@
 package com.amol.automation.actions;
 
 import org.apache.logging.log4j.Logger;
-import org.testng.Assert;
 
 import com.amol.automation.factory.ActionObjectManager;
 import com.amol.automation.factory.PageObjectManager;
@@ -9,105 +8,192 @@ import com.amol.automation.pages.HomePage;
 import com.amol.automation.pages.ProductPage;
 import com.amol.automation.reports.ExtentReportManager;
 import com.amol.automation.utils.LoggerUtils;
-import com.aventstack.extentreports.ExtentTest;
 
 /**
  * Business actions for Product functionality.
  *
- * Handles the product add-to-cart business flow.
+ * Responsibilities:
+ * - Perform product-related business operations
+ * - Coordinate LoginActions where required
+ * - Create high-level business reporting nodes
+ * - Return UI state to Test layer
+ *
+ * Assertions remain in Test layer.
+ *
+ * Reporting flow:
+ *
+ * Test
+ *   -> Extent Test Title
+ *
+ * Action
+ *   -> createNode()
+ *
+ * Page Object
+ *   -> info()
+ *   -> pass()
+ *   -> fail()
+ *
+ * Listener
+ *   -> final PASS / FAIL
  */
 public class ProductActions {
 
-	private static final Logger log = LoggerUtils.getLogger(ProductActions.class);
+    private static final Logger log =
+            LoggerUtils.getLogger(ProductActions.class);
 
-	private final HomePage homePage;
-	private final ProductPage productPage;
-	private final LoginActions loginActions;
+    private final HomePage homePage;
+    private final ProductPage productPage;
+    private final LoginActions loginActions;
 
-	/**
-	 * Initializes required Page Objects and Actions.
-	 */
-	public ProductActions() {
+    // =========================================================
+    // Constructor
+    // =========================================================
 
-		homePage = PageObjectManager.getHomePage();
+    public ProductActions() {
 
-		productPage = PageObjectManager.getProductPage();
+        homePage =
+                PageObjectManager.getHomePage();
 
-		loginActions = ActionObjectManager.getLoginActions();
-	}
+        productPage =
+                PageObjectManager.getProductPage();
 
-	/**
-	 * Verifies that a valid user can login and add a product to the cart.
-	 *
-	 * @param username valid username
-	 * @param password valid password
-	 */
-	public void verifyProductAddToCart(String username, String password) {
+        loginActions =
+                ActionObjectManager.getLoginActions();
+    }
 
-		ExtentTest productNode = ExtentReportManager.createNode("Product Add To Cart Flow");
+    // =========================================================
+    // Login
+    // =========================================================
 
-		productNode.info("[===== Product Flow Started =====]");
+    /**
+     * Performs login operation.
+     *
+     * LoginActions is responsible for creating
+     * the "Login" business node.
+     */
+    public void login(
+            String username,
+            String password) {
 
-		log.info("===== Product Flow Started =====");
+        log.info("Starting login");
 
-		// =====================================================
-		// Login
-		// =====================================================
+        loginActions.login(
+                username,
+                password);
 
-		ExtentTest loginNode = productNode.createNode("Login");
+        log.info("Login completed");
+    }
 
-		loginActions.login(username, password);
+    // =========================================================
+    // Product Page
+    // =========================================================
 
-		loginNode.pass("Login completed successfully");
+    /**
+     * Checks whether Products page is displayed.
+     *
+     * Assertions remain in Test layer.
+     *
+     * @return true if Products page is displayed
+     */
+    public boolean isHomePageDisplayed() {
 
-		loginNode.info("Verify Products page is displayed");
+        log.info(
+                "Checking Products page");
 
-		Assert.assertTrue(homePage.isHomePageDisplayed(), "Products page is not displayed after login");
+        return homePage.isHomePageDisplayed();
+    }
 
-		loginNode.pass("Products page displayed successfully");
+    /**
+     * Gets Products page title.
+     *
+     * @return Products page title
+     */
+    public String getProductsPageTitle() {
 
-		log.info("Login completed successfully");
+        log.info(
+                "Getting Products page title");
 
-		// =====================================================
-		// Product Page Verification
-		// =====================================================
+        return productPage.getProductsPageTitle();
+    }
 
-		ExtentTest productPageNode = productNode.createNode("Product Page Verification");
+    /**
+     * Adds specified product to cart.
+     *
+     * Creates business-level reporting node.
+     *
+     * @param productName product name
+     */
+    public void addProduct(
+            String productName) {
 
-		productPageNode.info("Verify Products page title");
+        ExtentReportManager.createNode(
+                "Add Product");
 
-		Assert.assertEquals(productPage.getProductsPageTitle(), "Products", "Products page title mismatch");
+        log.info(
+                "Adding product : {}",
+                productName);
 
-		productPageNode.pass("Products page title verified successfully");
+        productPage.addProduct(
+                productName);
 
-		log.info("Products page verified successfully");
+        log.info(
+                "Product added : {}",
+                productName);
+    }
 
-		// =====================================================
-		// Add Product To Cart
-		// =====================================================
+    /**
+     * Gets cart item count.
+     *
+     * @return cart count
+     */
+    public String getCartCount() {
 
-		ExtentTest addProductNode = productNode.createNode("Add Product To Cart");
+        log.info(
+                "Getting cart count");
 
-		addProductNode.info("Add Sauce Labs Backpack to cart");
+        return productPage.getCartCount();
+    }
 
-		productPage.addBackpack();
+    /**
+     * Opens shopping cart.
+     */
+    public void openCart() {
 
-		addProductNode.pass("Sauce Labs Backpack added successfully");
+        ExtentReportManager.createNode(
+                "Open Cart");
 
-		// =====================================================
-		// Verify Cart Count
-		// =====================================================
+        log.info(
+                "Opening cart");
 
-		addProductNode.info("Verify cart count");
+        productPage.clickCart();
+    }
 
-		Assert.assertEquals(productPage.getCartCount(), "1", "Cart count not updated after adding product");
+    // =========================================================
+    // Complete Product Flow
+    // =========================================================
 
-		addProductNode.pass("Cart count verified as 1");
+    /**
+     * Executes complete product add-to-cart business flow.
+     *
+     * Assertions remain in the Test layer.
+     *
+     * @param username username
+     * @param password password
+     * @param productName product to add
+     */
+    public void verifyProductAddToCart(
+            String username,
+            String password,
+            String productName) {
 
-		productNode.pass("[===== Product Flow Completed Successfully =====]");
+        login(
+                username,
+                password);
 
-		log.info("Product added to cart successfully");
+        addProduct(
+                productName);
 
-		log.info("===== Product Flow Completed =====");
-	}
+        log.info(
+                "Product add-to-cart flow completed");
+    }
 }

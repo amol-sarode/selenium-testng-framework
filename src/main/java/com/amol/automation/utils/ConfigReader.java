@@ -9,165 +9,229 @@ import org.apache.logging.log4j.Logger;
 import com.amol.automation.constants.FrameworkConstants;
 
 /**
- * ConfigReader
+ * Central configuration manager.
  *
- * Responsible for loading and reading framework configuration from
- * config.properties.
- *
- * Design: - Singleton - Thread-safe initialization - Configuration loaded only
- * once - Provides typed property access
+ * Responsibilities:
+ * - Load config.properties once
+ * - Provide String configuration values
+ * - Provide typed configuration values
+ * - Validate configuration keys and values
  */
 public final class ConfigReader {
 
-	private static volatile ConfigReader instance;
+    private ConfigReader() {
+        loadProperties();
+    }
 
-	private final Properties properties;
+    private static volatile ConfigReader instance;
 
-	private static final Logger log = LoggerUtils.getLogger(ConfigReader.class);
+    private final Properties properties =
+            new Properties();
 
-	/**
-	 * Private constructor to prevent external object creation.
-	 */
-	private ConfigReader() {
+    private static final Logger log =
+            LoggerUtils.getLogger(ConfigReader.class);
 
-		properties = new Properties();
+    // =========================================================
+    // Singleton
+    // =========================================================
 
-		loadProperties();
-	}
+    /**
+     * Returns the singleton ConfigReader instance.
+     *
+     * Uses double-checked locking for thread-safe lazy
+     * initialization.
+     */
+    public static ConfigReader getInstance() {
 
-	/**
-	 * Returns the single ConfigReader instance.
-	 *
-	 * @return ConfigReader instance
-	 */
-	public static ConfigReader getInstance() {
+        if (instance == null) {
 
-		if (instance == null) {
+            synchronized (ConfigReader.class) {
 
-			synchronized (ConfigReader.class) {
+                if (instance == null) {
 
-				if (instance == null) {
+                    instance =
+                            new ConfigReader();
+                }
+            }
+        }
 
-					instance = new ConfigReader();
-				}
-			}
-		}
+        return instance;
+    }
 
-		return instance;
-	}
+    // =========================================================
+    // Property Loading
+    // =========================================================
 
-	/**
-	 * Loads config.properties from the classpath.
-	 */
-	private void loadProperties() {
+    /**
+     * Loads config.properties from the classpath.
+     */
+    private void loadProperties() {
 
-		log.info("Loading configuration file : {}", FrameworkConstants.CONFIG_FILE_PATH);
+        log.info(
+                "Loading configuration file : {}",
+                FrameworkConstants.CONFIG_FILE_PATH);
 
-		try (InputStream inputStream = ConfigReader.class.getClassLoader().getResourceAsStream("config.properties")) {
+        try (InputStream inputStream =
+                     ConfigReader.class
+                             .getClassLoader()
+                             .getResourceAsStream(
+                                     FrameworkConstants.CONFIG_FILE_PATH)) {
 
-			if (inputStream == null) {
+            if (inputStream == null) {
 
-				throw new RuntimeException("Configuration file not found: " + FrameworkConstants.CONFIG_FILE_PATH);
-			}
+                throw new IllegalStateException(
+                        "Configuration file not found: "
+                                + FrameworkConstants.CONFIG_FILE_PATH);
+            }
 
-			properties.load(inputStream);
+            properties.load(inputStream);
 
-			log.info("Configuration file loaded successfully");
+            log.info(
+                    "Configuration file loaded successfully");
 
-		} catch (IOException e) {
+        } catch (IOException e) {
 
-			log.error("Unable to load configuration file", e);
+            log.error(
+                    "Unable to load configuration file",
+                    e);
 
-			throw new RuntimeException("Unable to load configuration file: " + FrameworkConstants.CONFIG_FILE_PATH, e);
-		}
-	}
+            throw new IllegalStateException(
+                    "Unable to load configuration file: "
+                            + FrameworkConstants.CONFIG_FILE_PATH,
+                    e);
+        }
+    }
 
-	/**
-	 * Returns a configuration value as String.
-	 *
-	 * @param key configuration key
-	 * @return configuration value
-	 */
-	public String getProperty(String key) {
+    // =========================================================
+    // String Property
+    // =========================================================
 
-		validateKey(key);
+    /**
+     * Returns a configuration value as String.
+     *
+     * @param key configuration key
+     * @return configuration value
+     */
+    public String getProperty(String key) {
 
-		String value = properties.getProperty(key);
+        validateKey(key);
 
-		if (value == null || value.trim().isEmpty()) {
+        String value =
+                properties.getProperty(key);
 
-			throw new RuntimeException("Configuration property is missing or empty: " + key);
-		}
+        if (value == null ||
+                value.trim().isEmpty()) {
 
-		return value.trim();
-	}
+            throw new IllegalStateException(
+                    "Configuration property is missing or empty: "
+                            + key);
+        }
 
-	/**
-	 * Returns a configuration value as Integer.
-	 *
-	 * @param key configuration key
-	 * @return integer value
-	 */
-	public int getIntProperty(String key) {
+        return value.trim();
+    }
 
-		String value = getProperty(key);
+    // =========================================================
+    // Integer Property
+    // =========================================================
 
-		try {
+    /**
+     * Returns a configuration value as integer.
+     *
+     * @param key configuration key
+     * @return integer configuration value
+     */
+    public int getIntProperty(String key) {
 
-			return Integer.parseInt(value);
+        String value =
+                getProperty(key);
 
-		} catch (NumberFormatException e) {
+        try {
 
-			throw new RuntimeException("Configuration property must be a valid integer: " + key + " = " + value, e);
-		}
-	}
+            return Integer.parseInt(value);
 
-	/**
-	 * Returns a configuration value as Boolean.
-	 *
-	 * @param key configuration key
-	 * @return boolean value
-	 */
-	public boolean getBooleanProperty(String key) {
+        } catch (NumberFormatException e) {
 
-		String value = getProperty(key);
+            throw new IllegalStateException(
+                    "Configuration property must be a valid integer: "
+                            + key
+                            + " = "
+                            + value,
+                    e);
+        }
+    }
 
-		if (!value.equalsIgnoreCase("true") && !value.equalsIgnoreCase("false")) {
+    // =========================================================
+    // Boolean Property
+    // =========================================================
 
-			throw new RuntimeException("Configuration property must be true or false: " + key + " = " + value);
-		}
+    /**
+     * Returns a configuration value as boolean.
+     *
+     * Only true or false are accepted.
+     *
+     * @param key configuration key
+     * @return boolean configuration value
+     */
+    public boolean getBooleanProperty(String key) {
 
-		return Boolean.parseBoolean(value);
-	}
+        String value =
+                getProperty(key);
 
-	/**
-	 * Checks whether a configuration property exists.
-	 *
-	 * @param key configuration key
-	 * @return true if property exists and is not empty
-	 */
-	public boolean hasProperty(String key) {
+        if (!value.equalsIgnoreCase("true")
+                && !value.equalsIgnoreCase("false")) {
 
-		if (key == null || key.trim().isEmpty()) {
+            throw new IllegalStateException(
+                    "Configuration property must be "
+                            + "true or false: "
+                            + key
+                            + " = "
+                            + value);
+        }
 
-			return false;
-		}
+        return Boolean.parseBoolean(value);
+    }
 
-		String value = properties.getProperty(key);
+    // =========================================================
+    // Property Existence
+    // =========================================================
 
-		return value != null && !value.trim().isEmpty();
-	}
+    /**
+     * Checks whether a property exists and contains
+     * a non-empty value.
+     *
+     * @param key configuration key
+     * @return true if property exists
+     */
+    public boolean hasProperty(String key) {
 
-	/**
-	 * Validates configuration key.
-	 *
-	 * @param key configuration key
-	 */
-	private void validateKey(String key) {
+        if (key == null ||
+                key.trim().isEmpty()) {
 
-		if (key == null || key.trim().isEmpty()) {
+            return false;
+        }
 
-			throw new IllegalArgumentException("Configuration key cannot be null or empty");
-		}
-	}
+        String value =
+                properties.getProperty(
+                        key.trim());
+
+        return value != null &&
+                !value.trim().isEmpty();
+    }
+
+    // =========================================================
+    // Validation
+    // =========================================================
+
+    /**
+     * Validates configuration key.
+     */
+    private void validateKey(String key) {
+
+        if (key == null ||
+                key.trim().isEmpty()) {
+
+            throw new IllegalArgumentException(
+                    "Configuration key cannot be null or empty");
+        }
+    }
 }

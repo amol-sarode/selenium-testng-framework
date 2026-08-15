@@ -10,7 +10,18 @@ import com.amol.automation.utils.LoggerUtils;
 /**
  * Business actions for Login functionality.
  *
- * Acts as an intermediate layer between test classes and LoginPage.
+ * Responsibilities: - Perform login business operation - Coordinate LoginPage -
+ * Create high-level business reporting nodes - Provide login-related UI state
+ * to Test layer
+ *
+ * Assertions belong to the Test layer.
+ *
+ * Reporting Flow:
+ *
+ * Test | v LoginActions.login() | v ExtentReportManager.createNode("Login") |
+ * +--> LoginPage.enterUsername() | --> INFO / PASS / FAIL | +-->
+ * LoginPage.enterPassword() | --> INFO / PASS / FAIL | +-->
+ * LoginPage.clickLogin() --> INFO / PASS / FAIL
  */
 public class LoginActions {
 
@@ -18,8 +29,12 @@ public class LoginActions {
 
 	private final LoginPage loginPage;
 
+	// =========================================================
+	// Constructor
+	// =========================================================
+
 	/**
-	 * Initializes LoginPage.
+	 * Initializes Login Page Object.
 	 */
 	public LoginActions() {
 
@@ -31,28 +46,34 @@ public class LoginActions {
 	// =========================================================
 
 	/**
-	 * Performs login using supplied credentials.
+	 * Performs complete login business operation.
+	 *
+	 * Creates one business-level Login node.
+	 *
+	 * Detailed UI reporting is handled by LoginPage.
 	 *
 	 * @param username username
 	 * @param password password
 	 */
 	public void login(String username, String password) {
 
-		ExtentReportManager.createNode("Login Process");
-
-		ExtentReportManager.info("[===== Login Process Started =====]");
+		ExtentReportManager.createNode("Login");
 
 		log.info("===== Login Process Started =====");
 
-		loginPage.enterUsername(username);
+		try {
 
-		loginPage.enterPassword(password);
+			loginPage.enterUsername(username);
+			loginPage.enterPassword(password);
+			loginPage.clickLogin();
+			log.info("===== Login Process Completed =====");
 
-		loginPage.clickLogin();
+		} catch (Exception e) {
 
-		ExtentReportManager.info("[===== Login Process Completed =====]");
+			log.error("Login process failed", e);
 
-		log.info("===== Login Process Completed =====");
+			throw e;
+		}
 	}
 
 	// =========================================================
@@ -60,9 +81,11 @@ public class LoginActions {
 	// =========================================================
 
 	/**
-	 * Verifies whether login error message is displayed.
+	 * Checks whether login error message is displayed.
 	 *
-	 * @return true if error message is displayed
+	 * No assertion is performed here.
+	 *
+	 * @return true if login error message is displayed
 	 */
 	public boolean isErrorMessageDisplayed() {
 
@@ -71,17 +94,19 @@ public class LoginActions {
 		return loginPage.isErrorMessageDisplayed();
 	}
 
+	// =========================================================
+	// Get Login Error
+	// =========================================================
+
 	/**
-     * Gets login error message.
-     *
-     * @return error message
-     */
-    public String getErrorMessage() {
+	 * Gets login error message.
+	 *
+	 * @return login error message
+	 */
+	public String getErrorMessage() {
 
-        log.info(
-                "Getting login error message"
-        );
+		log.info("Getting login error message");
 
-        return loginPage.getErrorMessage();
-    }
+		return loginPage.getErrorMessage();
+	}
 }

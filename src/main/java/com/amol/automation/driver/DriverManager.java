@@ -3,79 +3,95 @@ package com.amol.automation.driver;
 import org.openqa.selenium.WebDriver;
 
 /**
- * DriverManager
- *
  * Manages WebDriver instances using ThreadLocal.
  *
- * ThreadLocal allows each parallel test thread to have its own independent
- * WebDriver instance.
+ * ThreadLocal ensures that each parallel test thread
+ * has its own independent WebDriver instance.
  *
- * Responsibilities: - Store WebDriver for current thread - Retrieve WebDriver
- * for current thread - Remove WebDriver after execution
+ * Responsibilities:
+ * - Store WebDriver for current thread
+ * - Retrieve WebDriver for current thread
+ * - Check driver initialization
+ * - Remove WebDriver after execution
  */
 public final class DriverManager {
 
-	private DriverManager() {
-		// Prevent object creation
-	}
+    private DriverManager() {
+        // Prevent object creation
+    }
 
-	/**
-	 * ThreadLocal WebDriver.
-	 *
-	 * Each test thread gets its own WebDriver instance.
-	 */
-	private static final ThreadLocal<WebDriver> DRIVER = new ThreadLocal<>();
+    // =========================================================
+    // ThreadLocal WebDriver
+    // =========================================================
 
-	/**
-	 * Stores WebDriver for the current thread.
-	 *
-	 * @param driver WebDriver instance
-	 */
-	public static void setDriver(WebDriver driver) {
+    private static final ThreadLocal<WebDriver> DRIVER =
+            new ThreadLocal<>();
 
-		if (driver == null) {
+    // =========================================================
+    // Driver Management
+    // =========================================================
 
-			throw new IllegalArgumentException("WebDriver cannot be null");
-		}
+    /**
+     * Stores WebDriver for the current execution thread.
+     *
+     * @param driver WebDriver instance
+     */
+    public static void setDriver(WebDriver driver) {
 
-		DRIVER.set(driver);
-	}
+        if (driver == null) {
 
-	/**
-	 * Returns WebDriver associated with the current thread.
-	 *
-	 * @return current thread's WebDriver
-	 */
-	public static WebDriver getDriver() {
+            throw new IllegalArgumentException(
+                    "WebDriver cannot be null");
+        }
 
-		WebDriver driver = DRIVER.get();
+        DRIVER.set(driver);
+    }
 
-		if (driver == null) {
+    /**
+     * Returns WebDriver associated with the current thread.
+     *
+     * @return current thread's WebDriver
+     */
+    public static WebDriver getDriver() {
 
-			throw new IllegalStateException("WebDriver is not initialized for the current thread");
-		}
+        WebDriver driver =
+                DRIVER.get();
 
-		return driver;
-	}
+        if (driver == null) {
 
-	/**
-	 * Checks whether a WebDriver exists for the current thread.
-	 *
-	 * @return true if driver exists
-	 */
-	public static boolean isDriverInitialized() {
+            throw new IllegalStateException(
+                    "WebDriver is not initialized "
+                    + "for the current thread");
+        }
 
-		return DRIVER.get() != null;
-	}
+        return driver;
+    }
 
-	/**
-	 * Removes WebDriver from the current thread.
-	 *
-	 * This is important for ThreadLocal cleanup and prevents thread-local memory
-	 * leaks.
-	 */
-	public static void unload() {
+    /**
+     * Checks whether WebDriver is initialized
+     * for the current execution thread.
+     *
+     * @return true if driver exists
+     */
+    public static boolean isDriverInitialized() {
 
-		DRIVER.remove();
-	}
+        return DRIVER.get() != null;
+    }
+
+    // =========================================================
+    // Cleanup
+    // =========================================================
+
+    /**
+     * Removes WebDriver from the current thread.
+     *
+     * Important for:
+     * - ThreadLocal cleanup
+     * - Preventing stale driver references
+     * - Preventing ThreadLocal memory leaks
+     */
+    public static void unload() {
+
+        DRIVER.remove();
+    }
 }

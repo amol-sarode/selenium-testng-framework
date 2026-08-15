@@ -3,75 +3,279 @@ package com.amol.automation.pages;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 
+import com.amol.automation.reports.ExtentReportManager;
 import com.amol.automation.utils.ElementUtils;
 import com.amol.automation.utils.LoggerUtils;
 
 /**
- * Page Object class for SauceDemo Products Page.
+ * Page Object for SauceDemo Products Page.
  *
- * Contains only product-page locators and page-level methods.
+ * Responsibilities:
+ * - Store product locators
+ * - Perform product UI operations
+ * - Report INFO/PASS/FAIL
+ * - Return UI state
+ *
+ * Assertions and business decisions do NOT belong here.
+ *
+ * Reporting:
+ *
+ * Test Title
+ *      |
+ *      +-- Add Product
+ *            +-- INFO
+ *            +-- PASS
+ *            +-- FAIL
  */
 public class ProductPage {
 
-	private static final Logger log = LoggerUtils.getLogger(ProductPage.class);
+    private static final Logger log =
+            LoggerUtils.getLogger(ProductPage.class);
 
-	// =========================================================
-	// Locators
-	// =========================================================
+    // =========================================================
+    // Locators
+    // =========================================================
 
-	private final By productsTitle = By.className("title");
+    private final By productsTitle =
+            By.className("title");
 
-	private final By addBackpackButton = By.id("add-to-cart-sauce-labs-backpack");
+    private final By cartBadge =
+            By.className("shopping_cart_badge");
 
-	private final By cartBadge = By.className("shopping_cart_badge");
+    private final By cartIcon =
+            By.className("shopping_cart_link");
 
-	private final By cartIcon = By.className("shopping_cart_link");
+    // =========================================================
+    // Products Page Title
+    // =========================================================
 
-	// =========================================================
-	// Page Methods
-	// =========================================================
+    public String getProductsPageTitle() {
 
-	/**
-	 * Gets the Products page title.
-	 *
-	 * @return Products page title
-	 */
-	public String getProductsPageTitle() {
+        ExtentReportManager.info(
+                "Get Products page title");
 
-		log.info("Getting Products page title");
+        try {
 
-		return ElementUtils.getText(productsTitle);
-	}
+            String title =
+                    ElementUtils.getText(
+                            productsTitle);
 
-	/**
-	 * Adds Sauce Labs Backpack to the cart.
-	 */
-	public void addBackpack() {
+            log.info(
+                    "Products page title retrieved : {}",
+                    title);
 
-		log.info("Adding Sauce Labs Backpack to cart");
+            ExtentReportManager.pass(
+                    "Products page title retrieved successfully");
 
-		ElementUtils.click(addBackpackButton);
-	}
+            return title;
 
-	/**
-	 * Gets the cart badge count.
-	 *
-	 * @return cart item count
-	 */
-	public String getCartCount() {
+        } catch (Exception e) {
 
-		log.info("Getting cart badge count");
+            log.error(
+                    "Unable to get Products page title",
+                    e);
 
-		return ElementUtils.getText(cartBadge);
-	}
+            ExtentReportManager.fail(
+                    "Unable to get Products page title: "
+                            + getExceptionMessage(e));
 
-	/**
-	 * Opens the shopping cart.
-	 */
-	public void clickCart() {
+            throw e;
+        }
+    }
 
-		log.info("Opening shopping cart");
+    // =========================================================
+    // Add Product
+    // =========================================================
 
-		ElementUtils.click(cartIcon);
-	}
+    /**
+     * Adds the specified product to cart.
+     *
+     * SauceDemo uses the following ID convention:
+     *
+     * add-to-cart-sauce-labs-backpack
+     *
+     * Product name:
+     *
+     * Sauce Labs Backpack
+     */
+    public void addProduct(
+            String productName) {
+
+        validateProductName(
+                productName);
+
+        ExtentReportManager.info(
+                "Add product to cart : "
+                        + productName);
+
+        try {
+
+            String productId =
+                    productName
+                            .trim()
+                            .toLowerCase()
+                            .replace(" ", "-");
+
+            By addToCartButton =
+                    By.id(
+                            "add-to-cart-"
+                                    + productId);
+
+            ElementUtils.click(
+                    addToCartButton);
+
+            log.info(
+                    "Product added to cart successfully : {}",
+                    productName);
+
+            ExtentReportManager.pass(
+                    "Product added to cart successfully : "
+                            + productName);
+
+        } catch (Exception e) {
+
+            log.error(
+                    "Unable to add product to cart : {}",
+                    productName,
+                    e);
+
+            ExtentReportManager.fail(
+                    "Unable to add product to cart : "
+                            + productName
+                            + " - "
+                            + getExceptionMessage(e));
+
+            throw e;
+        }
+    }
+
+    // =========================================================
+    // Cart Count
+    // =========================================================
+
+    /**
+     * Returns cart count.
+     *
+     * If the cart is empty, SauceDemo does not display
+     * the cart badge. Therefore zero is returned instead
+     * of throwing an exception.
+     */
+    public String getCartCount() {
+
+        ExtentReportManager.info(
+                "Get cart item count");
+
+        try {
+
+            boolean displayed =
+                    ElementUtils.isDisplayed(
+                            cartBadge);
+
+            if (!displayed) {
+
+                log.info(
+                        "Cart is empty");
+
+                ExtentReportManager.pass(
+                        "Cart item count retrieved successfully : 0");
+
+                return "0";
+            }
+
+            String count =
+                    ElementUtils.getText(
+                            cartBadge);
+
+            log.info(
+                    "Cart item count : {}",
+                    count);
+
+            ExtentReportManager.pass(
+                    "Cart item count retrieved successfully : "
+                            + count);
+
+            return count;
+
+        } catch (Exception e) {
+
+            log.error(
+                    "Unable to get cart item count",
+                    e);
+
+            ExtentReportManager.fail(
+                    "Unable to get cart item count: "
+                            + getExceptionMessage(e));
+
+            throw e;
+        }
+    }
+
+    // =========================================================
+    // Open Cart
+    // =========================================================
+
+    public void clickCart() {
+
+        ExtentReportManager.info(
+                "Click shopping cart");
+
+        try {
+
+            ElementUtils.click(
+                    cartIcon);
+
+            log.info(
+                    "Shopping cart opened successfully");
+
+            ExtentReportManager.pass(
+                    "Shopping cart opened successfully");
+
+        } catch (Exception e) {
+
+            log.error(
+                    "Unable to open shopping cart",
+                    e);
+
+            ExtentReportManager.fail(
+                    "Unable to open shopping cart: "
+                            + getExceptionMessage(e));
+
+            throw e;
+        }
+    }
+
+    // =========================================================
+    // Validation
+    // =========================================================
+
+    private void validateProductName(
+            String productName) {
+
+        if (productName == null ||
+                productName.trim().isEmpty()) {
+
+            throw new IllegalArgumentException(
+                    "Product name cannot be null or empty");
+        }
+    }
+
+    // =========================================================
+    // Exception Message
+    // =========================================================
+
+    private String getExceptionMessage(
+            Exception e) {
+
+        if (e == null) {
+            return "Unknown error";
+        }
+
+        String message =
+                e.getMessage();
+
+        return message != null
+                && !message.trim().isEmpty()
+                        ? message
+                        : e.getClass().getSimpleName();
+    }
 }

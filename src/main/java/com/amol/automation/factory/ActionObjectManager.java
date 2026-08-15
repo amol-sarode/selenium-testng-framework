@@ -5,75 +5,78 @@ import com.amol.automation.actions.LoginActions;
 import com.amol.automation.actions.ProductActions;
 
 /**
- * Action Object Manager.
+ * Central manager for Action Objects.
  *
- * Responsible for creating and managing thread-safe Action Objects.
- *
- * Uses ThreadLocal to ensure each parallel test thread gets its own Action
- * Object instance.
+ * Responsibilities:
+ * - Maintain Action Objects using ThreadLocal
+ * - Provide thread-safe Action Object access
+ * - Prevent sharing Action Objects during parallel execution
+ * - Cleanup ThreadLocal references after test execution
  */
 public final class ActionObjectManager {
 
-	private ActionObjectManager() {
-	}
+    private ActionObjectManager() {
+        // Prevent object creation
+    }
 
-	private static final ThreadLocal<LoginActions> loginActions = new ThreadLocal<>();
+    // =========================================================
+    // ThreadLocal Action Objects
+    // =========================================================
 
-	private static final ThreadLocal<ProductActions> productActions = new ThreadLocal<>();
+    private static final ThreadLocal<LoginActions> LOGIN_ACTIONS =
+            ThreadLocal.withInitial(LoginActions::new);
 
-	private static final ThreadLocal<EndToEndActions> endToEndActions = new ThreadLocal<>();
+    private static final ThreadLocal<ProductActions> PRODUCT_ACTIONS =
+            ThreadLocal.withInitial(ProductActions::new);
 
-	/**
-	 * Returns the LoginActions instance for the current thread.
-	 */
-	public static LoginActions getLoginActions() {
+    private static final ThreadLocal<EndToEndActions> END_TO_END_ACTIONS =
+            ThreadLocal.withInitial(EndToEndActions::new);
 
-		if (loginActions.get() == null) {
+    // =========================================================
+    // Action Object Access
+    // =========================================================
 
-			loginActions.set(new LoginActions());
-		}
+    /**
+     * Returns LoginActions for current execution thread.
+     */
+    public static LoginActions getLoginActions() {
 
-		return loginActions.get();
-	}
+        return LOGIN_ACTIONS.get();
+    }
 
-	/**
-	 * Returns the ProductActions instance for the current thread.
-	 */
-	public static ProductActions getProductActions() {
+    /**
+     * Returns ProductActions for current execution thread.
+     */
+    public static ProductActions getProductActions() {
 
-		if (productActions.get() == null) {
+        return PRODUCT_ACTIONS.get();
+    }
 
-			productActions.set(new ProductActions());
-		}
+    /**
+     * Returns EndToEndActions for current execution thread.
+     */
+    public static EndToEndActions getEndToEndActions() {
 
-		return productActions.get();
-	}
+        return END_TO_END_ACTIONS.get();
+    }
 
-	/**
-	 * Returns the EndToEndActions instance for the current thread.
-	 */
-	public static EndToEndActions getEndToEndActions() {
+    // =========================================================
+    // Cleanup
+    // =========================================================
 
-		if (endToEndActions.get() == null) {
+    /**
+     * Removes all Action Objects associated
+     * with the current execution thread.
+     *
+     * Prevents:
+     * - ThreadLocal memory leaks
+     * - Stale Action Object references
+     * - Cross-test object reuse
+     */
+    public static void unload() {
 
-			endToEndActions.set(new EndToEndActions());
-		}
-
-		return endToEndActions.get();
-	}
-
-	/**
-	 * Removes all Action Objects associated with the current execution thread.
-	 *
-	 * This prevents ThreadLocal memory leaks and ensures clean execution for the
-	 * next test.
-	 */
-	public static void unload() {
-
-		loginActions.remove();
-
-		productActions.remove();
-
-		endToEndActions.remove();
-	}
+        LOGIN_ACTIONS.remove();
+        PRODUCT_ACTIONS.remove();
+        END_TO_END_ACTIONS.remove();
+    }
 }

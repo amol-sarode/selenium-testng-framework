@@ -14,78 +14,125 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 
+import com.amol.automation.constants.FrameworkConstants;
 import com.amol.automation.driver.DriverManager;
 
 /**
  * Utility class for screenshot handling.
  *
- * Responsibility: - Capture current browser screen - Save screenshot in
- * screenshots folder
+ * Responsibilities:
+ * - Capture current browser screen
+ * - Save screenshot in screenshots folder
+ *
+ * Screenshot handling is centralized here.
  */
 public final class ScreenshotUtils {
 
-	private ScreenshotUtils() {
-	}
+    private ScreenshotUtils() {
+        // Prevent object creation
+    }
 
-	private static final Logger log = LoggerUtils.getLogger(ScreenshotUtils.class);
+    private static final Logger log =
+            LoggerUtils.getLogger(ScreenshotUtils.class);
 
-	private static final String SCREENSHOT_FOLDER = "screenshots";
+    private static final DateTimeFormatter TIMESTAMP_FORMAT =
+            DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS");
 
-	private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS");
+    /**
+     * Captures the current browser screen.
+     *
+     * @param testName test name
+     * @return absolute screenshot path
+     */
+    public static String captureScreenshot(String testName) {
 
-	/**
-	 * Captures the current browser screen.
-	 *
-	 * @param testName test name
-	 * @return absolute screenshot path
-	 */
-	public static String captureScreenshot(String testName) {
+        if (testName == null ||
+                testName.trim().isEmpty()) {
 
-		if (testName == null || testName.trim().isEmpty()) {
-			throw new IllegalArgumentException("Test name cannot be null or empty");
-		}
+            throw new IllegalArgumentException(
+                    "Test name cannot be null or empty");
+        }
 
-		WebDriver driver = DriverManager.getDriver();
+        WebDriver driver =
+                DriverManager.getDriver();
 
-		if (!(driver instanceof TakesScreenshot)) {
-			throw new IllegalStateException("WebDriver does not support screenshots");
-		}
+        if (!(driver instanceof TakesScreenshot)) {
 
-		String timestamp = LocalDateTime.now().format(TIMESTAMP_FORMAT);
+            throw new IllegalStateException(
+                    "WebDriver does not support screenshots");
+        }
 
-		String fileName = sanitizeFileName(testName) + "_" + timestamp + ".png";
+        String timestamp =
+                LocalDateTime.now()
+                        .format(TIMESTAMP_FORMAT);
 
-		Path screenshotFolder = Paths.get(System.getProperty("user.dir"), SCREENSHOT_FOLDER);
+        String fileName =
+                sanitizeFileName(testName)
+                + "_"
+                + timestamp
+                + ".png";
 
-		Path destination = screenshotFolder.resolve(fileName);
+        Path screenshotFolder =
+                Paths.get(
+                        FrameworkConstants.SCREENSHOT_FOLDER);
 
-		try {
+        Path destination =
+                screenshotFolder.resolve(fileName);
 
-			Files.createDirectories(screenshotFolder);
+        try {
 
-			File source = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+            Files.createDirectories(
+                    screenshotFolder);
 
-			Files.copy(source.toPath(), destination, StandardCopyOption.REPLACE_EXISTING);
+            File source =
+                    ((TakesScreenshot) driver)
+                            .getScreenshotAs(
+                                    OutputType.FILE);
 
-			String screenshotPath = destination.toAbsolutePath().toString();
+            Files.copy(
+                    source.toPath(),
+                    destination,
+                    StandardCopyOption.REPLACE_EXISTING);
 
-			log.info("Screenshot saved : {}", screenshotPath);
+            String screenshotPath =
+                    destination
+                            .toAbsolutePath()
+                            .toString();
 
-			return screenshotPath;
+            log.info(
+                    "Screenshot saved : {}",
+                    screenshotPath);
 
-		} catch (IOException e) {
+            return screenshotPath;
 
-			log.error("Unable to save screenshot", e);
+        } catch (IOException e) {
 
-			throw new RuntimeException("Screenshot capture failed", e);
-		}
-	}
+            log.error(
+                    "Unable to save screenshot",
+                    e);
 
-	/**
-	 * Makes test name safe for file name.
-	 */
-	private static String sanitizeFileName(String fileName) {
+            throw new RuntimeException(
+                    "Screenshot capture failed",
+                    e);
+        }
+    }
 
-		return fileName.trim().replaceAll("[\\\\/:*?\"<>|]", "_").replaceAll("\\s+", "_");
-	}
+    /**
+     * Makes test name safe for a file name.
+     *
+     * @param fileName original test name
+     * @return sanitized file name
+     */
+    private static String sanitizeFileName(
+            String fileName) {
+
+        return fileName
+                .trim()
+                .replaceAll(
+                        "[\\\\/:*?\"<>|]",
+                        "_")
+                .replaceAll(
+                        "\\s+",
+                        "_");
+    }
 }

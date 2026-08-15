@@ -1,266 +1,235 @@
 package com.amol.automation.actions;
 
 import org.apache.logging.log4j.Logger;
-import org.testng.Assert;
 
+import com.amol.automation.factory.ActionObjectManager;
 import com.amol.automation.factory.PageObjectManager;
 import com.amol.automation.pages.CartPage;
 import com.amol.automation.pages.CheckoutCompletePage;
 import com.amol.automation.pages.CheckoutOverviewPage;
 import com.amol.automation.pages.CheckoutPage;
 import com.amol.automation.pages.HomePage;
-import com.amol.automation.pages.LoginPage;
 import com.amol.automation.pages.ProductPage;
 import com.amol.automation.reports.ExtentReportManager;
 import com.amol.automation.utils.LoggerUtils;
-import com.aventstack.extentreports.ExtentTest;
 
 /**
- * Business actions for the complete SauceDemo purchase flow.
+ * Business actions for complete SauceDemo purchase workflow.
  *
- * Handles the end-to-end business workflow from login through successful order
- * completion.
+ * Responsibilities: - Execute business operations - Coordinate Page Objects -
+ * Create business-level report nodes - Return UI values to Test layer
+ *
+ * Assertions do not belong here.
  */
 public class EndToEndActions {
 
 	private static final Logger log = LoggerUtils.getLogger(EndToEndActions.class);
 
-	private final LoginPage loginPage;
 	private final HomePage homePage;
 	private final ProductPage productPage;
 	private final CartPage cartPage;
 	private final CheckoutPage checkoutPage;
 	private final CheckoutOverviewPage checkoutOverviewPage;
 	private final CheckoutCompletePage checkoutCompletePage;
+	private final LoginActions loginActions;
 
-	/**
-	 * Initializes all required Page Objects.
-	 */
 	public EndToEndActions() {
 
-		loginPage = PageObjectManager.getLoginPage();
 		homePage = PageObjectManager.getHomePage();
+
 		productPage = PageObjectManager.getProductPage();
+
 		cartPage = PageObjectManager.getCartPage();
+
 		checkoutPage = PageObjectManager.getCheckoutPage();
+
 		checkoutOverviewPage = PageObjectManager.getCheckoutOverviewPage();
+
 		checkoutCompletePage = PageObjectManager.getCheckoutCompletePage();
+
+		loginActions = ActionObjectManager.getLoginActions();
 	}
 
-	/**
-	 * Verifies the complete purchase flow with a valid user.
-	 *
-	 * @param username   valid username
-	 * @param password   valid password
-	 * @param firstName  customer first name
-	 * @param lastName   customer last name
-	 * @param postalCode customer postal code
-	 */
-	public void verifyEndToEndPurchaseFlow(String username, String password, String firstName, String lastName,
-			String postalCode) {
+	// =========================================================
+	// Login
+	// =========================================================
 
-		ExtentTest e2eNode = ExtentReportManager.createNode("End To End Purchase Flow");
+	public void login(String username, String password) {
 
-		e2eNode.info("[===== E2E Purchase Flow Started =====]");
+		ExtentReportManager.createNode("Login");
 
-		log.info("===== SauceDemo E2E Purchase Started =====");
+		log.info("Starting login");
 
-		// =====================================================
-		// Login
-		// =====================================================
+		loginActions.login(username, password);
 
-		ExtentTest loginNode = e2eNode.createNode("Login");
+		log.info("Login completed");
+	}
 
-		loginNode.info("Enter username");
+	// =========================================================
+	// Products
+	// =========================================================
 
-		loginPage.enterUsername(username);
+	public String getProductsPageTitle() {
 
-		loginNode.info("Enter password");
+		ExtentReportManager.createNode("Verify Products Page");
 
-		loginPage.enterPassword(password);
+		log.info("Getting Products page title");
 
-		loginNode.info("Click Login button");
+		return productPage.getProductsPageTitle();
+	}
 
-		loginPage.clickLogin();
+	public boolean isHomePageDisplayed() {
 
-		Assert.assertTrue(homePage.isHomePageDisplayed(), "Home page is not displayed after login");
+		ExtentReportManager.createNode("Verify Products Page Displayed");
 
-		loginNode.pass("Login completed and Products page displayed");
+		log.info("Checking Products page");
 
-		log.info("Login completed successfully");
+		return homePage.isHomePageDisplayed();
+	}
 
-		// =====================================================
-		// Product Verification
-		// =====================================================
+	public void addProduct(String productName) {
 
-		ExtentTest productNode = e2eNode.createNode("Product Verification");
+		ExtentReportManager.createNode("Add Product - " + productName);
 
-		productNode.info("Verify Products page title");
+		log.info("Adding product: {}", productName);
 
-		Assert.assertEquals(productPage.getProductsPageTitle(), "Products", "Products page title mismatch");
+		productPage.addProduct(productName);
+	}
 
-		productNode.pass("Products page verified successfully");
+	public String getCartCount() {
 
-		log.info("Products page verified");
+		ExtentReportManager.createNode("Verify Cart Count");
 
-		// =====================================================
-		// Add Product
-		// =====================================================
+		log.info("Getting cart count");
 
-		ExtentTest addProductNode = e2eNode.createNode("Add Product");
+		return productPage.getCartCount();
+	}
 
-		addProductNode.info("Add Sauce Labs Backpack to cart");
+	public void openCart() {
 
-		productPage.addBackpack();
+		ExtentReportManager.createNode("Click Cart");
 
-		addProductNode.pass("Sauce Labs Backpack added to cart");
-
-		addProductNode.info("Verify cart count");
-
-		Assert.assertEquals(productPage.getCartCount(), "1", "Cart count is not updated");
-
-		addProductNode.pass("Cart count verified as 1");
-
-		log.info("Product added to cart successfully");
-
-		// =====================================================
-		// Cart Verification
-		// =====================================================
-
-		ExtentTest cartNode = e2eNode.createNode("Cart Verification");
-
-		cartNode.info("Open shopping cart");
+		log.info("Clicking Cart");
 
 		productPage.clickCart();
+	}
 
-		cartNode.pass("Shopping cart opened successfully");
+	// =========================================================
+	// Cart
+	// =========================================================
 
-		cartNode.info("Verify cart title");
+	public String getCartTitle() {
 
-		Assert.assertEquals(cartPage.getCartTitle(), "Your Cart", "Cart page title mismatch");
+		ExtentReportManager.createNode("Verify Cart Page");
 
-		cartNode.pass("Cart title verified successfully");
+		log.info("Getting Cart page title");
 
-		cartNode.info("Verify product in cart");
+		return cartPage.getCartTitle();
+	}
 
-		Assert.assertEquals(cartPage.getProductName(), "Sauce Labs Backpack", "Incorrect product added");
+	public String getCartProductName() {
 
-		cartNode.pass("Sauce Labs Backpack verified in cart");
+		ExtentReportManager.createNode("Verify Cart Product");
 
-		log.info("Cart verified successfully");
+		log.info("Getting product name from Cart");
 
-		// =====================================================
-		// Checkout Information
-		// =====================================================
+		return cartPage.getProductName();
+	}
 
-		ExtentTest checkoutNode = e2eNode.createNode("Checkout Information");
+	public void proceedToCheckout() {
 
-		checkoutNode.info("Click Checkout button");
+		ExtentReportManager.createNode("Click Checkout");
+
+		log.info("Clicking Checkout");
 
 		cartPage.clickCheckout();
+	}
 
-		checkoutNode.pass("Checkout button clicked successfully");
+	// =========================================================
+	// Checkout
+	// =========================================================
 
-		checkoutNode.info("Verify checkout information page");
+	public String getCheckoutTitle() {
 
-		Assert.assertEquals(checkoutPage.getCheckoutTitle(), "Checkout: Your Information",
-				"Checkout information page mismatch");
+		ExtentReportManager.createNode("Verify Checkout Information Page");
 
-		checkoutNode.pass("Checkout information page verified");
+		log.info("Getting Checkout Information page title");
 
-		checkoutNode.info("Enter first name");
+		return checkoutPage.getCheckoutTitle();
+	}
+
+	public void enterCheckoutInformation(String firstName, String lastName, String postalCode) {
+
+		ExtentReportManager.createNode("Enter Checkout Information");
+
+		log.info("Entering checkout information");
 
 		checkoutPage.enterFirstName(firstName);
 
-		checkoutNode.pass("First name entered successfully");
-
-		checkoutNode.info("Enter last name");
-
 		checkoutPage.enterLastName(lastName);
 
-		checkoutNode.pass("Last name entered successfully");
-
-		checkoutNode.info("Enter postal code");
-
 		checkoutPage.enterPostalCode(postalCode);
+	}
 
-		checkoutNode.pass("Postal code entered successfully");
+	public void continueCheckout() {
 
-		checkoutNode.info("Click Continue button");
+		ExtentReportManager.createNode("Click Continue");
+
+		log.info("Clicking Continue");
 
 		checkoutPage.clickContinue();
+	}
 
-		checkoutNode.pass("Continue button clicked successfully");
+	// =========================================================
+	// Checkout Overview
+	// =========================================================
 
-		// =====================================================
-		// Checkout Overview
-		// =====================================================
+	public String getOverviewTitle() {
 
-		ExtentTest overviewNode = e2eNode.createNode("Checkout Overview");
+		ExtentReportManager.createNode("Verify Checkout Overview Page");
 
-		overviewNode.info("Verify checkout overview page");
+		log.info("Getting Checkout Overview page title");
 
-		Assert.assertEquals(checkoutOverviewPage.getOverviewTitle(), "Checkout: Overview",
-				"Checkout overview page mismatch");
+		return checkoutOverviewPage.getOverviewTitle();
+	}
 
-		overviewNode.pass("Checkout overview page verified successfully");
+	public void finishOrder() {
 
-		log.info("Checkout overview verified");
+		ExtentReportManager.createNode("Click Finish");
 
-		// =====================================================
-		// Complete Order
-		// =====================================================
-
-		ExtentTest completeNode = e2eNode.createNode("Complete Order");
-
-		completeNode.info("Click Finish button");
+		log.info("Clicking Finish");
 
 		checkoutOverviewPage.clickFinish();
+	}
 
-		completeNode.pass("Finish button clicked successfully");
+	// =========================================================
+	// Order Complete
+	// =========================================================
 
-		completeNode.info("Verify checkout complete page");
+	public String getCompletePageTitle() {
 
-		Assert.assertEquals(checkoutCompletePage.getCompletePageTitle(), "Checkout: Complete!",
-				"Checkout complete page title mismatch");
+		ExtentReportManager.createNode("Verify Order Completion Page");
 
-		completeNode.pass("Checkout complete page verified");
+		log.info("Getting Order Completion page title");
 
-		completeNode.info("Verify thank-you message");
+		return checkoutCompletePage.getCompletePageTitle();
+	}
 
-		Assert.assertEquals(checkoutCompletePage.getThankYouMessage(), "Thank you for your order!",
-				"Thank-you message mismatch");
+	public String getThankYouMessage() {
 
-		completeNode.pass("Thank-you message verified successfully");
+		ExtentReportManager.createNode("Verify Order Confirmation");
 
-		log.info("Order completed successfully");
+		log.info("Getting order confirmation message");
 
-		// =====================================================
-		// Back To Products
-		// =====================================================
+		return checkoutCompletePage.getThankYouMessage();
+	}
 
-		ExtentTest backHomeNode = e2eNode.createNode("Back To Products");
+	public void backToProducts() {
 
-		backHomeNode.info("Click Back Home button");
+		ExtentReportManager.createNode("Click Back To Products");
+
+		log.info("Clicking Back To Products");
 
 		checkoutCompletePage.clickBackHome();
-
-		backHomeNode.pass("Back Home button clicked successfully");
-
-		backHomeNode.info("Verify Products page after order");
-
-		Assert.assertEquals(productPage.getProductsPageTitle(), "Products", "User is not redirected to Products page");
-
-		backHomeNode.pass("User redirected to Products page successfully");
-
-		log.info("Back to Products page verified");
-
-		// =====================================================
-		// Flow Completed
-		// =====================================================
-
-		e2eNode.pass("[===== E2E Purchase Flow Completed Successfully =====]");
-
-		log.info("===== SauceDemo E2E Purchase Completed =====");
 	}
 }

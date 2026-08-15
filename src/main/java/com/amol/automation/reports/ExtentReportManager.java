@@ -9,6 +9,8 @@ import java.time.format.DateTimeFormatter;
 
 import org.apache.logging.log4j.Logger;
 
+import com.amol.automation.enums.BrowserType;
+import com.amol.automation.enums.Environment;
 import com.amol.automation.utils.LoggerUtils;
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;
@@ -16,263 +18,332 @@ import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.reporter.ExtentHtmlReporter;
 
 /**
- * Manages Extent Reports.
+ * Central manager for Extent Reports.
  *
- * ThreadLocal is used so the framework remains safe for
- * parallel test execution.
+ * Reporting hierarchy:
+ *
+ * Test Title | +-- Business Node | +-- INFO +-- PASS +-- FAIL
+ *
+ * Responsibilities: - Initialize Extent Report - Create parent test - Create
+ * business nodes - Log page-level INFO/PASS/FAIL - Log final test
+ * PASS/FAIL/SKIP - Attach screenshots - Manage ThreadLocal objects - Flush
+ * report
+ *
+ * Assertions remain in Test classes.
  */
 public final class ExtentReportManager {
 
-    private ExtentReportManager() {
-    }
+	private ExtentReportManager() {
+		// Prevent object creation
+	}
 
-    private static ExtentReports extent;
+	private static final Logger log = LoggerUtils.getLogger(ExtentReportManager.class);
 
-    private static final ThreadLocal<ExtentTest> currentTest =
-            new ThreadLocal<>();
+	private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
-    private static final ThreadLocal<ExtentTest> currentNode =
-            new ThreadLocal<>();
+	private static ExtentReports extent;
 
-    private static final Logger log =
-            LoggerUtils.getLogger(ExtentReportManager.class);
+	private static final ThreadLocal<ExtentTest> CURRENT_TEST = new ThreadLocal<>();
 
-    // =========================================================
-    // Report Initialization
-    // =========================================================
+	private static final ThreadLocal<ExtentTest> CURRENT_NODE = new ThreadLocal<>();
 
-    public static synchronized void initReports() {
+	// =========================================================
+	// Report Initialization
+	// =========================================================
 
-        if (extent != null) {
-            return;
-        }
+	public static synchronized void initReports() {
 
-        try {
-
-            Path reportFolder =
-                    Paths.get(
-                            System.getProperty("user.dir"),
-                            "reports"
-                    );
-
-            Files.createDirectories(reportFolder);
-
-            String timestamp =
-                    LocalDateTime.now().format(
-                            DateTimeFormatter.ofPattern(
-                                    "yyyyMMdd_HHmmss"
-                            )
-                    );
-
-            String reportPath =
-                    reportFolder
-                            .resolve(
-                                    "AutomationReport_"
-                                            + timestamp
-                                            + ".html"
-                            )
-                            .toString();
-
-            ExtentHtmlReporter htmlReporter =
-                    new ExtentHtmlReporter(reportPath);
-
-            htmlReporter.config()
-                    .setDocumentTitle(
-                            "Automation Test Report"
-                    );
-
-            htmlReporter.config()
-                    .setReportName(
-                            "Selenium Java TestNG Framework"
-                    );
-
-            extent = new ExtentReports();
-
-            extent.attachReporter(htmlReporter);
-
-            extent.setSystemInfo(
-                    "Framework",
-                    "Selenium + Java + TestNG"
-            );
-
-            extent.setSystemInfo(
-                    "Author",
-                    "Amol"
-            );
-
-            extent.setSystemInfo(
-                    "Environment",
-                    "QA"
-            );
-
-            log.info(
-                    "Extent Report Created : {}",
-                    reportPath
-            );
-
-        } catch (Exception e) {
-
-            log.error(
-                    "Extent Report initialization failed",
-                    e
-            );
-
-            throw new RuntimeException(
-                    "Extent Report initialization failed",
-                    e
-            );
-        }
-    }
-
-    // =========================================================
-    // Test Management
-    // =========================================================
-
-    public static ExtentTest createTest(String testName) {
-
-        if (extent == null) {
-            initReports();
-        }
-
-        ExtentTest test =
-                extent.createTest(testName);
-
-        currentTest.set(test);
-
-        currentNode.remove();
-
-        return test;
-    }
-
-    public static ExtentTest getTest() {
-
-        ExtentTest test =
-                currentTest.get();
-
-        if (test == null) {
-            throw new IllegalStateException(
-                    "Extent Test is not created."
-            );
-        }
-
-        return test;
-    }
-
-    public static boolean hasTest() {
-
-        return currentTest.get() != null;
-    }
-
-    // =========================================================
-    // Node Management
-    // =========================================================
-
-    public static ExtentTest createNode(String nodeName) {
-
-        ExtentTest node;
-
-        if (currentNode.get() != null) {
-
-            node =
-                    currentNode.get()
-                            .createNode(nodeName);
-
-        } else {
-
-            node =
-                    getTest()
-                            .createNode(nodeName);
-        }
-
-        currentNode.set(node);
-
-        return node;
-    }
-
-    public static ExtentTest getCurrentNode() {
-
-        ExtentTest node =
-                currentNode.get();
-
-        return node != null
-                ? node
-                : getTest();
-    }
-
-    // =========================================================
-    // Logging
-    // =========================================================
-
-    public static void info(String message) {
-
-        getCurrentNode()
-                .log(Status.INFO, message);
-    }
-
-    public static void pass(String message) {
-
-        getCurrentNode()
-                .log(Status.PASS, message);
-    }
-
-    public static void fail(String message) {
-
-        getTest()
-                .log(Status.FAIL, message);
-    }
-
-    public static void warning(String message) {
-
-        getCurrentNode()
-                .log(Status.WARNING, message);
-    }
-
-    // =========================================================
-    // Screenshot
-    // =========================================================
-
-    /**
-     * Attaches screenshot to the current Extent test.
-     *
-     * Screenshot is called by TestListener only.
-     */
-    public static void addScreenshot(
-            String screenshotPath) {
-
-        try {
-			getTest()
-			        .addScreenCaptureFromPath(
-			                screenshotPath
-			        );
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if (extent != null) {
+			return;
 		}
-    }
 
-    // =========================================================
-    // Cleanup
-    // =========================================================
+		try {
 
-    public static void unload() {
+			// -------------------------------------------------
+			// Report Folder
+			// -------------------------------------------------
 
-        currentNode.remove();
-        currentTest.remove();
-    }
+			Path reportFolder = Paths.get(System.getProperty("user.dir"), "reports");
 
-    // =========================================================
-    // Report Flush
-    // =========================================================
+			Files.createDirectories(reportFolder);
 
-    public static synchronized void flushReports() {
+			// -------------------------------------------------
+			// Report File
+			// -------------------------------------------------
 
-        if (extent != null) {
+			String timestamp = LocalDateTime.now().format(TIMESTAMP_FORMAT);
 
-            extent.flush();
+			Path reportPath = reportFolder.resolve("AutomationReport_" + timestamp + ".html");
 
-            log.info(
-                    "Extent Report flushed"
-            );
-        }
-    }
+			// -------------------------------------------------
+			// Extent HTML Reporter
+			// -------------------------------------------------
+
+			ExtentHtmlReporter htmlReporter = new ExtentHtmlReporter(reportPath.toString());
+
+			htmlReporter.config().setDocumentTitle("Automation Test Report");
+
+			htmlReporter.config().setReportName("Selenium Java TestNG Framework");
+
+			// -------------------------------------------------
+			// Extent Reports
+			// -------------------------------------------------
+
+			extent = new ExtentReports();
+
+			extent.attachReporter(htmlReporter);
+
+			// -------------------------------------------------
+			// System Information
+			// -------------------------------------------------
+
+			extent.setSystemInfo("Framework", "Selenium + Java + TestNG");
+
+			extent.setSystemInfo("Environment", Environment.QA.name());
+
+			extent.setSystemInfo("Browser", System.getProperty("browser", BrowserType.CHROME.name()));
+
+			extent.setSystemInfo("Engineer", "Amol Sarode");
+
+			log.info("Extent Report initialized : {}", reportPath.toAbsolutePath());
+
+			log.info("Execution Environment : {}", Environment.QA.name());
+
+		} catch (IllegalArgumentException e) {
+
+			log.error("Invalid environment configured", e);
+
+			throw new RuntimeException("Invalid environment. Use QA, UAT or PROD.", e);
+
+		} catch (Exception e) {
+
+			log.error("Extent Report initialization failed", e);
+
+			throw new RuntimeException("Extent Report initialization failed", e);
+		}
+	}
+
+	// =========================================================
+	// Test
+	// =========================================================
+
+	/**
+	 * Creates parent Test.
+	 *
+	 * Called by TestListener.
+	 */
+	public static void createTest(String testName) {
+
+		validateMessage(testName, "Test name");
+
+		if (extent == null) {
+			initReports();
+		}
+
+		ExtentTest test = extent.createTest(testName);
+
+		CURRENT_TEST.set(test);
+
+		CURRENT_NODE.remove();
+
+		log.debug("Extent Test created : {}", testName);
+	}
+
+	/**
+	 * Returns current parent test.
+	 */
+	public static ExtentTest getTest() {
+
+		ExtentTest test = CURRENT_TEST.get();
+
+		if (test == null) {
+
+			throw new IllegalStateException("Extent Test is not available " + "for current thread");
+		}
+
+		return test;
+	}
+
+	/**
+	 * Checks whether parent test exists.
+	 */
+	public static boolean hasTest() {
+
+		return CURRENT_TEST.get() != null;
+	}
+
+	// =========================================================
+	// Node
+	// =========================================================
+
+	/**
+	 * Creates business node under current Test.
+	 *
+	 * Action classes use this method.
+	 */
+	public static ExtentTest createNode(String nodeName) {
+
+		validateMessage(nodeName, "Node name");
+
+		ExtentTest test = getTest();
+
+		ExtentTest node = test.createNode(nodeName);
+
+		CURRENT_NODE.set(node);
+
+		log.debug("Extent Node created : {}", nodeName);
+
+		return node;
+	}
+
+	/**
+	 * Returns current logging node.
+	 */
+	private static ExtentTest getCurrentLogger() {
+
+		ExtentTest node = CURRENT_NODE.get();
+
+		if (node == null) {
+
+			throw new IllegalStateException("Extent Node is not available " + "for current thread. "
+					+ "Action must create a node " + "before Page Object reporting.");
+		}
+
+		return node;
+	}
+
+	// =========================================================
+	// Page INFO
+	// =========================================================
+
+	public static void info(String message) {
+
+		validateMessage(message, "Information message");
+
+		getCurrentLogger().log(Status.INFO, message);
+	}
+
+	// =========================================================
+	// Page PASS
+	// =========================================================
+
+	public static void pass(String message) {
+
+		validateMessage(message, "Pass message");
+
+		getCurrentLogger().log(Status.PASS, message);
+	}
+
+	// =========================================================
+	// Page FAIL
+	// =========================================================
+
+	public static void fail(String message) {
+
+		validateMessage(message, "Fail message");
+
+		getCurrentLogger().log(Status.FAIL, message);
+	}
+
+	// =========================================================
+	// Test PASS
+	// =========================================================
+
+	public static void testPass(String message) {
+
+		validateMessage(message, "Test pass message");
+
+		getTest().log(Status.PASS, message);
+	}
+
+	// =========================================================
+	// Test FAIL
+	// =========================================================
+
+	public static void testFail(String message) {
+
+		validateMessage(message, "Test fail message");
+
+		getTest().log(Status.FAIL, message);
+	}
+
+	// =========================================================
+	// Test SKIP
+	// =========================================================
+
+	public static void skip(String message) {
+
+		validateMessage(message, "Skip message");
+
+		getTest().log(Status.SKIP, message);
+	}
+
+	// =========================================================
+	// Warning
+	// =========================================================
+
+	public static void warning(String message) {
+
+		validateMessage(message, "Warning message");
+
+		getCurrentLogger().log(Status.WARNING, message);
+	}
+
+	// =========================================================
+	// Screenshot
+	// =========================================================
+
+	public static void addScreenshot(String screenshotPath) {
+
+		validateMessage(screenshotPath, "Screenshot path");
+
+		try {
+
+			getTest().addScreenCaptureFromPath(screenshotPath);
+
+			log.debug("Screenshot attached : {}", screenshotPath);
+
+		} catch (IOException e) {
+
+			log.error("Unable to attach screenshot", e);
+		}
+	}
+
+	// =========================================================
+	// Cleanup
+	// =========================================================
+
+	public static void unload() {
+
+		CURRENT_NODE.remove();
+		CURRENT_TEST.remove();
+
+		log.debug("Extent ThreadLocal objects unloaded");
+	}
+
+	// =========================================================
+	// Flush
+	// =========================================================
+
+	public static synchronized void flushReports() {
+
+		if (extent != null) {
+
+			extent.flush();
+
+			log.info("Extent Report flushed successfully");
+		}
+	}
+
+	// =========================================================
+	// Validation
+	// =========================================================
+
+	private static void validateMessage(String message, String fieldName) {
+
+		if (message == null || message.trim().isEmpty()) {
+
+			throw new IllegalArgumentException(fieldName + " cannot be null or empty");
+		}
+	}
 }

@@ -9,107 +9,200 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * JSON Utility class.
+ * Utility class for reading JSON test data.
  *
- * Responsible for reading JSON files and retrieving values from JSON objects.
+ * Responsibilities:
+ * - Read JSON files
+ * - Return JSON root node
+ * - Retrieve values from JSON objects
+ *
+ * Does not contain business logic or assertions.
  */
 public final class JsonUtils {
 
-	private JsonUtils() {
-	}
+    private JsonUtils() {
+        // Prevent object creation
+    }
 
-	private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final Logger log =
+            LoggerUtils.getLogger(JsonUtils.class);
 
-	private static final Logger log = LoggerUtils.getLogger(JsonUtils.class);
+    private static final ObjectMapper MAPPER =
+            new ObjectMapper();
 
-	/**
-	 * Reads a JSON file and returns its root JsonNode.
-	 *
-	 * @param filePath JSON file path
-	 * @return root JsonNode
-	 */
-	public static JsonNode readJson(String filePath) {
+    // =========================================================
+    // Read JSON
+    // =========================================================
 
-		log.info("Reading JSON file: {}", filePath);
+    /**
+     * Reads a JSON file.
+     *
+     * @param filePath JSON file path
+     * @return root JsonNode
+     */
+    public static JsonNode readJson(String filePath) {
 
-		if (filePath == null || filePath.trim().isEmpty()) {
-			throw new IllegalArgumentException("JSON file path cannot be null or empty");
-		}
+        validateFilePath(filePath);
 
-		File file = new File(filePath);
+        File file = new File(filePath);
 
-		if (!file.exists()) {
-			throw new RuntimeException("JSON file not found: " + filePath);
-		}
+        if (!file.exists()) {
+            throw new RuntimeException(
+                    "JSON file not found: " + filePath);
+        }
 
-		if (!file.isFile()) {
-			throw new RuntimeException("JSON path is not a file: " + filePath);
-		}
+        if (!file.isFile()) {
+            throw new RuntimeException(
+                    "JSON path is not a file: " + filePath);
+        }
 
-		try {
+        log.info(
+                "Reading JSON file: {}",
+                filePath);
 
-			JsonNode rootNode = MAPPER.readTree(file);
+        try {
 
-			if (rootNode == null) {
-				throw new RuntimeException("JSON file is empty: " + filePath);
-			}
+            JsonNode rootNode =
+                    MAPPER.readTree(file);
 
-			log.info("JSON file loaded successfully: {}", filePath);
+            if (rootNode == null ||
+                    rootNode.isNull()) {
 
-			return rootNode;
+                throw new RuntimeException(
+                        "JSON file is empty: " + filePath);
+            }
 
-		} catch (IOException e) {
+            log.info(
+                    "JSON file loaded successfully: {}",
+                    filePath);
 
-			log.error("Unable to read JSON file: {}", filePath, e);
+            return rootNode;
 
-			throw new RuntimeException("Unable to read JSON file: " + filePath, e);
-		}
-	}
+        } catch (IOException e) {
 
-	/**
-	 * Retrieves a value from a JSON object.
-	 *
-	 * Example:
-	 *
-	 * { "validUser": { "username": "standard_user" } }
-	 *
-	 * getValue(filePath, "validUser", "username")
-	 *
-	 * @param filePath   JSON file path
-	 * @param objectName JSON object name
-	 * @param key        key inside the object
-	 * @return value as String
-	 */
-	public static String getValue(String filePath, String objectName, String key) {
+            log.error(
+                    "Unable to read JSON file: {}",
+                    filePath,
+                    e);
 
-		if (objectName == null || objectName.trim().isEmpty()) {
-			throw new IllegalArgumentException("JSON object name cannot be null or empty");
-		}
+            throw new RuntimeException(
+                    "Unable to read JSON file: "
+                            + filePath,
+                    e);
+        }
+    }
 
-		if (key == null || key.trim().isEmpty()) {
-			throw new IllegalArgumentException("JSON key cannot be null or empty");
-		}
+    // =========================================================
+    // Get JSON Value
+    // =========================================================
 
-		JsonNode rootNode = readJson(filePath);
+    /**
+     * Gets a value from a JSON object.
+     *
+     * Example:
+     *
+     * {
+     *   "validUser": {
+     *     "username": "standard_user"
+     *   }
+     * }
+     *
+     * getValue(filePath, "validUser", "username");
+     *
+     * @param filePath   JSON file path
+     * @param objectName JSON object name
+     * @param key        key inside object
+     * @return value as String
+     */
+    public static String getValue(
+            String filePath,
+            String objectName,
+            String key) {
 
-		JsonNode objectNode = rootNode.get(objectName);
+        validateFilePath(filePath);
 
-		if (objectNode == null || objectNode.isNull()) {
+        if (objectName == null ||
+                objectName.trim().isEmpty()) {
 
-			throw new RuntimeException("JSON object not found: " + objectName);
-		}
+            throw new IllegalArgumentException(
+                    "JSON object name cannot be null or empty");
+        }
 
-		JsonNode valueNode = objectNode.get(key);
+        if (key == null ||
+                key.trim().isEmpty()) {
 
-		if (valueNode == null || valueNode.isNull()) {
+            throw new IllegalArgumentException(
+                    "JSON key cannot be null or empty");
+        }
 
-			throw new RuntimeException("JSON key not found: " + key + " in object: " + objectName);
-		}
+        JsonNode rootNode =
+                readJson(filePath);
 
-		String value = valueNode.asText();
+        if (!rootNode.isObject()) {
 
-		log.info("JSON value retrieved successfully. Object: {}, Key: {}", objectName, key);
+            throw new RuntimeException(
+                    "JSON root must be an object: "
+                            + filePath);
+        }
 
-		return value;
-	}
+        JsonNode objectNode =
+                rootNode.get(objectName);
+
+        if (objectNode == null ||
+                objectNode.isNull()) {
+
+            throw new RuntimeException(
+                    "JSON object not found: "
+                            + objectName);
+        }
+
+        if (!objectNode.isObject()) {
+
+            throw new RuntimeException(
+                    "JSON node is not an object: "
+                            + objectName);
+        }
+
+        JsonNode valueNode =
+                objectNode.get(key);
+
+        if (valueNode == null ||
+                valueNode.isNull()) {
+
+            throw new RuntimeException(
+                    "JSON key not found: "
+                            + key
+                            + " in object: "
+                            + objectName);
+        }
+
+        String value =
+                valueNode.asText().trim();
+
+        log.info(
+                "JSON value retrieved successfully. "
+                        + "Object: {}, Key: {}",
+                objectName,
+                key);
+
+        return value;
+    }
+
+    // =========================================================
+    // Validation
+    // =========================================================
+
+    /**
+     * Validates JSON file path.
+     */
+    private static void validateFilePath(
+            String filePath) {
+
+        if (filePath == null ||
+                filePath.trim().isEmpty()) {
+
+            throw new IllegalArgumentException(
+                    "JSON file path cannot be null or empty");
+        }
+    }
 }

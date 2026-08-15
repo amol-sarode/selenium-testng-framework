@@ -1,54 +1,72 @@
 package com.amol.automation.constants;
 
 /**
- * FrameworkConstants
+ * Central repository for framework-level constants.
  *
- * Contains framework-level constants used throughout the automation framework.
+ * Environment-specific configuration such as:
+ * - Application URL
+ * - Browser
+ * - Timeouts
+ * - Headless mode
  *
- * Configuration values such as URL, browser, timeout, and environment are
- * maintained in config.properties.
+ * is maintained in config.properties.
  */
 public final class FrameworkConstants {
 
-	private FrameworkConstants() {
-		// Prevent object creation
-	}
+    private FrameworkConstants() {
+        // Prevent object creation
+    }
 
-	// =========================================================
-	// Configuration
-	// =========================================================
+    // =========================================================
+    // Configuration
+    // =========================================================
 
-	public static final String CONFIG_FILE_PATH = "src/main/resources/config.properties";
+    /**
+     * Configuration file available on the classpath.
+     */
+    public static final String CONFIG_FILE_PATH =
+            "config.properties";
 
-	// =========================================================
-	// Reports
-	// =========================================================
+    // =========================================================
+    // Reports
+    // =========================================================
 
-	public static final String REPORT_FOLDER = System.getProperty("user.dir") + "/reports/";
+    public static final String REPORT_FOLDER =
+            System.getProperty("user.dir")
+                    + "/reports/";
 
-	// =========================================================
-	// Screenshots
-	// =========================================================
+    // =========================================================
+    // Screenshots
+    // =========================================================
 
-	public static final String SCREENSHOT_FOLDER = System.getProperty("user.dir") + "/screenshots/";
+    public static final String SCREENSHOT_FOLDER =
+            System.getProperty("user.dir")
+                    + "/screenshots/";
 
-	// =========================================================
-	// Logs
-	// =========================================================
+    // =========================================================
+    // Logs
+    // =========================================================
 
-	public static final String LOG_FOLDER = System.getProperty("user.dir") + "/logs/";
+    public static final String LOG_FOLDER =
+            System.getProperty("user.dir")
+                    + "/logs/";
 
-	// =========================================================
-	// Test Data
-	// =========================================================
+    // =========================================================
+    // Test Data
+    // =========================================================
 
-	public static final String TEST_DATA_FOLDER = "src/main/resources/testdata/";
+    public static final String TEST_DATA_FOLDER =
+            "src/main/resources/testdata/";
 
-	public static final String LOGIN_EXCEL_FILE = TEST_DATA_FOLDER + "LoginData.xlsx";
+    public static final String LOGIN_EXCEL_FILE =
+            TEST_DATA_FOLDER + "LoginData.xlsx";
 
-	public static final String LOGIN_SHEET = "LoginData";
+    public static final String LOGIN_SHEET =
+            "LoginData";
 
-	public static final String USERS_JSON_FILE = TEST_DATA_FOLDER + "Users.json";
+    public static final String USERS_JSON_FILE =
+            TEST_DATA_FOLDER + "Users.json";
 
-	public static final String PRODUCT_JSON_FILE = TEST_DATA_FOLDER + "ProductData.json";
+    public static final String PRODUCT_JSON_FILE =
+            TEST_DATA_FOLDER + "ProductData.json";
 }

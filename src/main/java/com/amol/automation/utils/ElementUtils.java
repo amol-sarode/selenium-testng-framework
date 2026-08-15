@@ -11,100 +11,153 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import com.amol.automation.driver.DriverManager;
 
 /**
- * Element Utility class.
+ * Utility class for common Selenium WebElement interactions.
  *
- * Provides reusable methods for common Selenium WebElement interactions using
- * explicit waits.
+ * Responsibilities:
+ * - Click elements
+ * - Enter text
+ * - Read element text
+ * - Check element visibility
+ *
+ * Assertions do not belong here.
  */
 public final class ElementUtils {
 
-	private ElementUtils() {
-	}
+    private ElementUtils() {
+    }
 
-	private static final Logger log = LoggerUtils.getLogger(ElementUtils.class);
+    private static final Logger log =
+            LoggerUtils.getLogger(ElementUtils.class);
 
-	private static final int WAIT_TIME = 20;
+    private static final int WAIT_TIME = 20;
 
-	/**
-	 * Creates WebDriverWait using the current thread's driver.
-	 */
-	private static WebDriverWait getWait() {
+    private static WebDriverWait getWait() {
 
-		return new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(WAIT_TIME));
-	}
+        return new WebDriverWait(
+                DriverManager.getDriver(),
+                Duration.ofSeconds(WAIT_TIME));
+    }
 
-	/**
-	 * Clicks an element after waiting until it is clickable.
-	 *
-	 * @param locator element locator
-	 */
-	public static void click(By locator) {
+    // =========================================================
+    // Click
+    // =========================================================
 
-		log.debug("Clicking element : {}", locator);
+    public static void click(By locator) {
 
-		WebElement element = getWait().until(ExpectedConditions.elementToBeClickable(locator));
+        validateLocator(locator);
 
-		element.click();
+        log.debug("Clicking element : {}", locator);
 
-		log.debug("Element clicked successfully : {}", locator);
-	}
+        WebElement element =
+                getWait().until(
+                        ExpectedConditions.elementToBeClickable(locator));
 
-	/**
-	 * Enters text into an input field after waiting until the element is visible.
-	 *
-	 * @param locator element locator
-	 * @param text    text to enter
-	 */
-	public static void enterText(By locator, String text) {
+        element.click();
 
-		log.debug("Entering text into element : {}", locator);
+        log.debug("Element clicked successfully : {}", locator);
+    }
 
-		WebElement element = getWait().until(ExpectedConditions.visibilityOfElementLocated(locator));
+    // =========================================================
+    // Enter Text
+    // =========================================================
 
-		element.clear();
-		element.sendKeys(text);
+    public static void enterText(By locator, String text) {
 
-		log.debug("Text entered successfully : {}", locator);
-	}
+        validateLocator(locator);
 
-	/**
-	 * Gets visible text from an element.
-	 *
-	 * @param locator element locator
-	 * @return element text
-	 */
-	public static String getText(By locator) {
+        if (text == null) {
+            throw new IllegalArgumentException(
+                    "Text cannot be null");
+        }
 
-		log.debug("Getting text from element : {}", locator);
+        log.debug("Entering text into element : {}", locator);
 
-		WebElement element = getWait().until(ExpectedConditions.visibilityOfElementLocated(locator));
+        WebElement element =
+                getWait().until(
+                        ExpectedConditions.visibilityOfElementLocated(
+                                locator));
 
-		String text = element.getText();
+        element.clear();
+        element.sendKeys(text);
 
-		log.debug("Text retrieved : {}", text);
+        log.debug(
+                "Text entered successfully : {}",
+                locator);
+    }
 
-		return text;
-	}
+    // =========================================================
+    // Get Input Value
+    // =========================================================
 
-	/**
-	 * Checks whether an element is displayed.
-	 *
-	 * @param locator element locator
-	 * @return true if displayed, otherwise false
-	 */
-	public static boolean isDisplayed(By locator) {
+    public static String getInputValue(By locator) {
 
-		try {
+        validateLocator(locator);
 
-			WebElement element = getWait().until(ExpectedConditions.visibilityOfElementLocated(locator));
+        WebElement element =
+                getWait().until(
+                        ExpectedConditions.visibilityOfElementLocated(
+                                locator));
 
-			return element.isDisplayed();
+        return element.getAttribute("value");
+    }
 
-		} catch (Exception e) {
+    // =========================================================
+    // Get Text
+    // =========================================================
 
-			log.debug("Element is not displayed : {}", locator);
+    public static String getText(By locator) {
 
-			return false;
-		}
-	}
+        validateLocator(locator);
+
+        WebElement element =
+                getWait().until(
+                        ExpectedConditions.visibilityOfElementLocated(
+                                locator));
+
+        return element.getText().trim();
+    }
+
+    // =========================================================
+    // Is Displayed
+    // =========================================================
+
+    public static boolean isDisplayed(By locator) {
+
+        validateLocator(locator);
+
+        try {
+
+            WebElement element =
+                    getWait().until(
+                            ExpectedConditions.visibilityOfElementLocated(
+                                    locator));
+
+            return element.isDisplayed();
+
+        } catch (Exception e) {
+
+            log.debug(
+                    "Element is not displayed : {}",
+                    locator);
+
+            return false;
+        }
+    }
+
+    // =========================================================
+    // Validation
+    // =========================================================
+
+    private static void validateLocator(By locator) {
+
+        if (locator == null) {
+            throw new IllegalArgumentException(
+                    "Locator cannot be null");
+        }
+
+        if (!DriverManager.isDriverInitialized()) {
+            throw new IllegalStateException(
+                    "WebDriver is not initialized for current thread");
+        }
+    }
 }

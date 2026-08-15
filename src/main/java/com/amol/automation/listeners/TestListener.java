@@ -1,6 +1,7 @@
 package com.amol.automation.listeners;
 
 import org.apache.logging.log4j.Logger;
+import org.testng.IExecutionListener;
 import org.testng.ITestListener;
 import org.testng.ITestResult;
 
@@ -10,114 +11,375 @@ import com.amol.automation.utils.LoggerUtils;
 import com.amol.automation.utils.ScreenshotUtils;
 
 /**
- * TestNG listener.
+ * Central TestNG Listener.
  *
- * Responsibilities: - Log test execution status - Capture screenshot on test
- * failure - Attach screenshot to Extent Report - Log failure reason
+ * Extent Reporting Flow:
  *
- * Screenshot logic is centralized here.
+ * TestNG @Test(description)
+ *          |
+ *          v
+ *     Test Title
+ *          |
+ *          v
+ *    Action createNode()
+ *          |
+ *          v
+ *     Page info()
+ *          |
+ *          v
+ * Listener final PASS / FAIL
+ *
+ * Responsibilities:
+ * - Initialize Extent Report
+ * - Create Extent Test automatically from @Test description
+ * - Assign TestNG groups as Extent categories
+ * - Handle test execution status
+ * - Capture failure screenshots
+ * - Attach screenshots to Extent Report
+ * - Flush Extent Report
+ *
+ * ThreadLocal cleanup is handled by BaseTest.tearDown().
  */
-public class TestListener implements ITestListener {
+public final class TestListener
+        implements ITestListener, IExecutionListener {
 
-	private static final Logger log = LoggerUtils.getLogger(TestListener.class);
+    private static final Logger log =
+            LoggerUtils.getLogger(TestListener.class);
 
-	// =========================================================
-	// Test Start
-	// =========================================================
+    // =========================================================
+    // Execution Lifecycle
+    // =========================================================
 
-	@Override
-	public void onTestStart(ITestResult result) {
+    /**
+     * Called once before complete TestNG execution.
+     */
+    @Override
+    public void onExecutionStart() {
 
-		log.info("Test Started : {}", getTestName(result));
-	}
+        log.info(
+                "========== Test Execution Started ==========");
 
-	// =========================================================
-	// Test Success
-	// =========================================================
+        ExtentReportManager.initReports();
+    }
 
-	@Override
-	public void onTestSuccess(ITestResult result) {
+    /**
+     * Called once after complete TestNG execution.
+     */
+    @Override
+    public void onExecutionFinish() {
 
-		log.info("Test Passed : {}", getTestName(result));
-	}
+        log.info(
+                "========== Test Execution Finished ==========");
 
-	// =========================================================
-	// Test Failure
-	// =========================================================
+        ExtentReportManager.flushReports();
+    }
 
-	@Override
-	public void onTestFailure(ITestResult result) {
+    // =========================================================
+    // Test Start
+    // =========================================================
 
-		String testName = getTestName(result);
+    /**
+     * Creates the parent Extent Test automatically.
+     *
+     * Priority:
+     *
+     * @Test(description)
+     *        |
+     *        v
+     * Extent Test Title
+     *
+     * If description is unavailable,
+     * Java method name is used.
+     */
+    @Override
+    public void onTestStart(
+            ITestResult result) {
 
-		log.error("Test Failed : {}", testName);
+        String testTitle =
+                getTestTitle(result);
 
-		Throwable throwable = result.getThrowable();
+        String technicalTestName =
+                getTestName(result);
 
-		if (throwable != null) {
-			log.error("Failure Reason : {}", throwable.getMessage());
-		}
+        log.info(
+                "Test Started : {}",
+                technicalTestName);
 
-		/*
-		 * IMPORTANT:
-		 *
-		 * At this point the failed test method has completed, but BaseTest @AfterMethod
-		 * has not closed the browser yet.
-		 *
-		 * Therefore the screenshot captures the CURRENT browser state.
-		 *
-		 * For invalid login this should contain the red SauceDemo error message
-		 * displayed after clicking Login.
-		 */
-		if (!DriverManager.isDriverInitialized()) {
+        // -----------------------------------------------------
+        // Create Test Title
+        // -----------------------------------------------------
 
-			log.error("WebDriver is not available. Screenshot cannot be captured.");
+        ExtentReportManager.createTest(
+                testTitle);
 
-			return;
-		}
+        // -----------------------------------------------------
+        // Assign TestNG Groups
+        // -----------------------------------------------------
 
-		try {
+        String[] groups =
+                result.getMethod()
+                        .getGroups();
 
-			String screenshotPath = ScreenshotUtils.captureScreenshot(testName);
+        if (groups != null &&
+                groups.length > 0) {
 
-			log.info("Failure screenshot captured : {}", screenshotPath);
+            for (String group : groups) {
 
-			/*
-			 * Add failure information to Extent Report.
-			 */
-			if (ExtentReportManager.hasTest()) {
+                ExtentReportManager
+                        .getTest()
+                        .assignCategory(group);
+            }
+        }
 
-				String failureMessage = throwable != null ? throwable.getMessage() : "Test failed";
+        log.info(
+                "Extent Test Created : {}",
+                testTitle);
+    }
 
-				ExtentReportManager.fail("Test Failed : " + failureMessage);
+    // =========================================================
+    // Test Success
+    // =========================================================
 
-				ExtentReportManager.addScreenshot(screenshotPath);
+    /**
+     * Marks the complete test as PASS.
+     *
+     * Final PASS is controlled centrally by Listener.
+     */
+    @Override
+    public void onTestSuccess(
+            ITestResult result) {
 
-				log.info("Failure screenshot attached to Extent Report");
-			}
+        String testName =
+                getTestName(result);
 
-		} catch (Exception e) {
+        log.info(
+                "Test Passed : {}",
+                testName);
 
-			log.error("Unable to capture failure screenshot", e);
-		}
-	}
+        if (ExtentReportManager.hasTest()) {
 
-	// =========================================================
-	// Test Skipped
-	// =========================================================
+            ExtentReportManager.testPass(
+                    "Test Passed Successfully");
+        }
 
-	@Override
-	public void onTestSkipped(ITestResult result) {
+        /*
+         * ThreadLocal cleanup is handled by
+         * BaseTest.tearDown().
+         */
+    }
 
-		log.warn("Test Skipped : {}", getTestName(result));
-	}
+    // =========================================================
+    // Test Failure
+    // =========================================================
 
-	// =========================================================
-	// Utility
-	// =========================================================
+    /**
+     * Marks the complete test as FAIL and captures
+     * a failure screenshot.
+     */
+    @Override
+    public void onTestFailure(
+            ITestResult result) {
 
-	private String getTestName(ITestResult result) {
+        String testName =
+                getTestName(result);
 
-		return result.getTestClass().getRealClass().getSimpleName() + "." + result.getMethod().getMethodName();
-	}
+        log.error(
+                "Test Failed : {}",
+                testName);
+
+        Throwable throwable =
+                result.getThrowable();
+
+        String failureMessage =
+                getFailureMessage(throwable);
+
+        // -----------------------------------------------------
+        // Final FAIL
+        // -----------------------------------------------------
+
+        if (ExtentReportManager.hasTest()) {
+
+            ExtentReportManager.testFail(
+                    "Test Failed : "
+                            + failureMessage);
+        }
+
+        // -----------------------------------------------------
+        // Failure Screenshot
+        // -----------------------------------------------------
+
+        if (!DriverManager.isDriverInitialized()) {
+
+            log.warn(
+                    "WebDriver is not available. "
+                            + "Failure screenshot cannot be captured.");
+
+            return;
+        }
+
+        try {
+
+            String screenshotPath =
+                    ScreenshotUtils.captureScreenshot(
+                            testName);
+
+            log.info(
+                    "Failure screenshot captured : {}",
+                    screenshotPath);
+
+            if (ExtentReportManager.hasTest()) {
+
+                ExtentReportManager.addScreenshot(
+                        screenshotPath);
+
+                log.info(
+                        "Failure screenshot attached to Extent Report");
+            }
+
+        } catch (Exception e) {
+
+            log.error(
+                    "Unable to capture failure screenshot",
+                    e);
+        }
+
+        /*
+         * ThreadLocal cleanup is handled by
+         * BaseTest.tearDown().
+         */
+    }
+
+    // =========================================================
+    // Test Skipped
+    // =========================================================
+
+    /**
+     * Marks the complete test as SKIPPED.
+     */
+    @Override
+    public void onTestSkipped(
+            ITestResult result) {
+
+        String testName =
+                getTestName(result);
+
+        log.warn(
+                "Test Skipped : {}",
+                testName);
+
+        if (ExtentReportManager.hasTest()) {
+
+            Throwable throwable =
+                    result.getThrowable();
+
+            String message =
+                    getFailureMessage(throwable);
+
+            ExtentReportManager.skip(
+                    "Test Skipped : "
+                            + message);
+        }
+
+        /*
+         * ThreadLocal cleanup is handled by
+         * BaseTest.tearDown().
+         */
+    }
+
+    // =========================================================
+    // Success Percentage
+    // =========================================================
+
+    @Override
+    public void onTestFailedButWithinSuccessPercentage(
+            ITestResult result) {
+
+        log.warn(
+                "Test failed but within success percentage : {}",
+                getTestName(result));
+    }
+
+    // =========================================================
+    // Test Title
+    // =========================================================
+
+    /**
+     * Gets Extent Test title from TestNG @Test description.
+     *
+     * Example:
+     *
+     * @Test(
+     *     description =
+     *     "Verify product add to cart with valid user"
+     * )
+     *
+     * Extent Test Title:
+     *
+     * Verify product add to cart with valid user
+     */
+    private String getTestTitle(
+            ITestResult result) {
+
+        String description =
+                result.getMethod()
+                        .getDescription();
+
+        if (description != null &&
+                !description.trim().isEmpty()) {
+
+            return description.trim();
+        }
+
+        return result.getMethod()
+                .getMethodName();
+    }
+
+    // =========================================================
+    // Technical Test Name
+    // =========================================================
+
+    /**
+     * Returns:
+     *
+     * ClassName.methodName
+     */
+    private String getTestName(
+            ITestResult result) {
+
+        return result.getTestClass()
+                .getRealClass()
+                .getSimpleName()
+                + "."
+                + result.getMethod()
+                .getMethodName();
+    }
+
+    // =========================================================
+    // Failure Message
+    // =========================================================
+
+    /**
+     * Safely extracts failure/skip message.
+     */
+    private String getFailureMessage(
+            Throwable throwable) {
+
+        if (throwable == null) {
+
+            return "No failure details available";
+        }
+
+        String message =
+                throwable.getMessage();
+
+        if (message == null ||
+                message.trim().isEmpty()) {
+
+            return throwable
+                    .getClass()
+                    .getSimpleName();
+        }
+
+        return message;
+    }
 }

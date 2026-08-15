@@ -1,37 +1,108 @@
 package com.amol.automation.tests;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.amol.automation.actions.ProductActions;
 import com.amol.automation.base.BaseTest;
 import com.amol.automation.listeners.RetryAnalyzer;
-import com.amol.automation.reports.ExtentReportManager;
 
 /**
  * Test class for SauceDemo product functionality.
  *
- * Covers: - Login with valid user - Product page verification - Add product to
- * cart - Cart count verification
+ * Responsibilities:
+ * - Define test data
+ * - Call business actions
+ * - Perform test assertions
+ *
+ * Reporting architecture:
+ *
+ * @Test(description)
+ *        ↓
+ * TestListener creates Extent Test
+ *        ↓
+ * Action creates business Node
+ *        ↓
+ * Page Object creates INFO / PASS / FAIL logs
+ *        ↓
+ * Test performs assertions
+ *        ↓
+ * TestListener handles final PASS / FAIL + screenshot
+ *
+ * Assertions remain in Test layer.
  */
 public class ProductTest extends BaseTest {
 
-	private final ProductActions productActions = new ProductActions();
+    private final ProductActions productActions =
+            new ProductActions();
 
-	// =========================================================
-	// Product Add To Cart
-	// =========================================================
+    // =========================================================
+    // Verify Product Add To Cart
+    // =========================================================
 
-	@Test(description = "Verify product add to cart with valid user", groups = { "smoke",
-			"regression" }, retryAnalyzer = RetryAnalyzer.class)
-	public void verifyProductAddToCart() {
+    @Test(
+        description = "Verify product add to cart with valid user",
+        groups = {
+            "smoke",
+            "regression"
+        },
+        retryAnalyzer = RetryAnalyzer.class
+    )
+    public void verifyProductAddToCart() {
 
-		ExtentReportManager.createTest("Verify Product Add To Cart");
+        // =====================================================
+        // Test Data
+        // =====================================================
 
-		ExtentReportManager.getTest().assignCategory("Product Testing");
+        String username =
+                "standard_user";
 
-		String username = "standard_user";
-		String password = "secret_sauce";
+        String password =
+                "secret_sauce";
 
-		productActions.verifyProductAddToCart(username, password);
-	}
+        String productName =
+                "Sauce Labs Backpack";
+
+        // =====================================================
+        // Login
+        // =====================================================
+
+        productActions.login(
+                username,
+                password
+        );
+
+        // =====================================================
+        // Products Page Verification
+        // =====================================================
+
+        Assert.assertTrue(
+                productActions.isHomePageDisplayed(),
+                "Products page is not displayed after login"
+        );
+
+        Assert.assertEquals(
+                productActions.getProductsPageTitle(),
+                "Products",
+                "Products page title mismatch"
+        );
+
+        // =====================================================
+        // Add Product
+        // =====================================================
+
+        productActions.addProduct(
+                productName
+        );
+
+        // =====================================================
+        // Cart Verification
+        // =====================================================
+
+        Assert.assertEquals(
+                productActions.getCartCount(),
+                "1",
+                "Cart count is not updated correctly"
+        );
+    }
 }

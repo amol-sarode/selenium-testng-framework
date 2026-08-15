@@ -3,108 +3,232 @@ package com.amol.automation.pages;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 
+import com.amol.automation.driver.DriverManager;
 import com.amol.automation.reports.ExtentReportManager;
 import com.amol.automation.utils.ElementUtils;
 import com.amol.automation.utils.LoggerUtils;
 
 /**
- * Page Object class for SauceDemo Login Page.
+ * Page Object for SauceDemo Login Page.
  *
- * Contains login-page locators and page-level actions.
+ * Responsibilities:
+ * - Store locators
+ * - Perform UI operations
+ * - Return UI state
+ * - Report actual UI actions/results
+ *
+ * Assertions belong to Test layer.
  */
 public class LoginPage {
 
-	private static final Logger log = LoggerUtils.getLogger(LoginPage.class);
+    private static final Logger log =
+            LoggerUtils.getLogger(LoginPage.class);
 
-	// =========================================================
-	// Locators
-	// =========================================================
+    // =========================================================
+    // Locators
+    // =========================================================
 
-	private final By txtUsername = By.id("user-name");
+    private final By txtUsername =
+            By.id("user-name");
 
-	private final By txtPassword = By.id("password");
+    private final By txtPassword =
+            By.id("password");
 
-	private final By btnLogin = By.id("login-button");
+    private final By btnLogin =
+            By.id("login-button");
 
-	private final By errorMessage = By.xpath("//h3[@data-test='error']");
+    private final By errorMessage =
+            By.xpath("//h3[@data-test='error']");
 
-	// =========================================================
-	// Page Methods
-	// =========================================================
+    // =========================================================
+    // Username
+    // =========================================================
 
-	/**
-	 * Enter username.
-	 *
-	 * @param username username
-	 */
-	public void enterUsername(String username) {
+    public void enterUsername(String username) {
 
-		ElementUtils.enterText(txtUsername, username);
+        validateValue(username, "Username");
 
-		log.info("Username entered successfully");
+        ExtentReportManager.info(
+                "Entering username");
 
-		ExtentReportManager.info("Enter username : " + username);
-	}
+        try {
 
-	/**
-	 * Enter password.
-	 *
-	 * @param password password
-	 */
-	public void enterPassword(String password) {
+            ElementUtils.enterText(
+                    txtUsername,
+                    username);
 
-		ElementUtils.enterText(txtPassword, password);
+            log.info("Username entered successfully");
 
-		log.info("Password entered successfully");
+            ExtentReportManager.pass(
+                    "Username entered successfully");
 
-		/*
-		 * Do not log the actual password.
-		 */
-		ExtentReportManager.info("Password entered successfully");
-	}
+        } catch (Exception e) {
 
-	/**
-	 * Click Login button.
-	 */
-	public void clickLogin() {
+            log.error(
+                    "Unable to enter username",
+                    e);
 
-		ElementUtils.click(btnLogin);
+            ExtentReportManager.fail(
+                    "Unable to enter username");
 
-		log.info("Login button clicked");
+            throw e;
+        }
+    }
 
-		ExtentReportManager.info("Click Login button");
-	}
+    // =========================================================
+    // Password
+    // =========================================================
 
-	/**
-	 * Verify login error message is displayed.
-	 *
-	 * Page layer only checks the UI condition. Test layer is responsible for
-	 * assertion.
-	 *
-	 * @return true if error message is displayed
-	 */
-	public boolean isErrorMessageDisplayed() {
+    public void enterPassword(String password) {
 
-		log.info("Checking whether login error message is displayed");
+        validateValue(password, "Password");
 
-		ExtentReportManager.info("Verify login error message is displayed");
+        ExtentReportManager.info(
+                "Entering password");
 
-		return ElementUtils.isDisplayed(errorMessage);
-	}
+        try {
 
-	/**
-	 * Get login error message.
-	 *
-	 * @return error message text
-	 */
-	public String getErrorMessage() {
+            ElementUtils.enterText(
+                    txtPassword,
+                    password);
 
-		log.info("Getting login error message");
+            log.info("Password entered successfully");
 
-		String message = ElementUtils.getText(errorMessage);
+            ExtentReportManager.pass(
+                    "Password entered successfully");
 
-		ExtentReportManager.info("Error message : " + message);
+        } catch (Exception e) {
 
-		return message;
-	}
+            log.error(
+                    "Unable to enter password",
+                    e);
+
+            ExtentReportManager.fail(
+                    "Unable to enter password");
+
+            throw e;
+        }
+    }
+
+    // =========================================================
+    // Login
+    // =========================================================
+
+    public void clickLogin() {
+
+        ExtentReportManager.info(
+                "Clicking Login button");
+
+        try {
+
+            ElementUtils.click(btnLogin);
+
+            log.info("Login button clicked successfully");
+
+            ExtentReportManager.pass(
+                    "Login button clicked successfully");
+
+        } catch (Exception e) {
+
+            log.error(
+                    "Unable to click Login button",
+                    e);
+
+            ExtentReportManager.fail(
+                    "Unable to click Login button");
+
+            throw e;
+        }
+    }
+
+    // =========================================================
+    // Verify Successful Login
+    // =========================================================
+
+    /**
+     * Returns the actual page title after login.
+     *
+     * No assertion is performed here.
+     */
+    public String getPageTitle() {
+
+        String actualTitle =
+                DriverManager.getDriver().getTitle();
+
+        log.info(
+                "Actual page title after login: {}",
+                actualTitle);
+
+        ExtentReportManager.info(
+                "Actual page title after login: "
+                        + actualTitle);
+
+        return actualTitle;
+    }
+
+    // =========================================================
+    // Login Error
+    // =========================================================
+
+    public boolean isErrorMessageDisplayed() {
+
+        try {
+
+            boolean displayed =
+                    ElementUtils.isDisplayed(
+                            errorMessage);
+
+            log.info(
+                    "Login error displayed: {}",
+                    displayed);
+
+            return displayed;
+
+        } catch (Exception e) {
+
+            log.error(
+                    "Unable to verify login error message",
+                    e);
+
+            throw e;
+        }
+    }
+
+    // =========================================================
+    // Get Login Error
+    // =========================================================
+
+    public String getErrorMessage() {
+
+        String message =
+                ElementUtils.getText(
+                        errorMessage);
+
+        log.info(
+                "Actual login error message: {}",
+                message);
+
+        ExtentReportManager.info(
+                "Actual login error message: "
+                        + message);
+
+        return message;
+    }
+
+    // =========================================================
+    // Validation
+    // =========================================================
+
+    private void validateValue(
+            String value,
+            String fieldName) {
+
+        if (value == null ||
+                value.trim().isEmpty()) {
+
+            throw new IllegalArgumentException(
+                    fieldName +
+                    " cannot be null or empty");
+        }
+    }
 }

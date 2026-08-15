@@ -3,28 +3,46 @@ package com.amol.automation.listeners;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 
-/**
- * Provides retry functionality for failed TestNG tests.
- *
- * A failed test can be automatically re-executed up to the configured maximum
- * retry count.
- */
+import com.amol.automation.utils.ConfigReader;
+
 public class RetryAnalyzer implements IRetryAnalyzer {
 
-	private int retryCount = 0;
+    private int retryCount = 0;
 
-	private static final int MAX_RETRY_COUNT = 2;
+    @Override
+    public boolean retry(ITestResult result) {
 
-	@Override
-	public boolean retry(ITestResult result) {
+        boolean retryEnabled =
+                Boolean.parseBoolean(
+                        getProperty("retry.enabled", "false"));
 
-		if (retryCount < MAX_RETRY_COUNT) {
+        if (!retryEnabled) {
+            return false;
+        }
 
-			retryCount++;
+        int maxRetryCount =
+                Integer.parseInt(
+                        getProperty("retry.count", "1"));
 
-			return true;
-		}
+        if (retryCount < maxRetryCount) {
+            retryCount++;
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
+
+    private String getProperty(
+            String key,
+            String defaultValue) {
+
+        String value =
+                ConfigReader.getInstance()
+                        .getProperty(key);
+
+        return value == null
+                || value.trim().isEmpty()
+                        ? defaultValue
+                        : value;
+    }
 }

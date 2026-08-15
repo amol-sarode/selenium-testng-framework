@@ -18,13 +18,11 @@ import com.amol.automation.utils.LoggerUtils;
 import io.github.bonigarcia.wdm.WebDriverManager;
 
 /**
- * DriverFactory
+ * Factory responsible for creating and configuring WebDriver.
  *
- * Responsible for creating and configuring WebDriver instances.
+ * Supports: - Chrome - Firefox - Edge
  *
- * Supported browsers: - Chrome - Firefox - Edge
- *
- * Browser configuration is controlled through config.properties.
+ * Configuration is read from config.properties.
  */
 public final class DriverFactory {
 
@@ -34,14 +32,18 @@ public final class DriverFactory {
 
 	private static final Logger log = LoggerUtils.getLogger(DriverFactory.class);
 
+	// =========================================================
+	// Driver Initialization
+	// =========================================================
+
 	/**
-	 * Initializes WebDriver based on configuration.
+	 * Initializes WebDriver for the current execution thread.
 	 */
 	public static void initializeDriver() {
 
 		if (DriverManager.isDriverInitialized()) {
 
-			log.warn("WebDriver is already initialized for the current thread");
+			log.warn("WebDriver is already initialized for current thread");
 
 			return;
 		}
@@ -57,19 +59,24 @@ public final class DriverFactory {
 		int pageLoadTimeout = config.getIntProperty("page.load.timeout");
 
 		log.info("Initializing browser : {}", browser);
+
 		log.info("Headless mode : {}", headless);
 
 		WebDriver driver = createDriver(browser, headless);
 
-		configureDriver(driver, implicitWait, pageLoadTimeout);
+		configureDriver(driver, headless, implicitWait, pageLoadTimeout);
 
 		DriverManager.setDriver(driver);
 
 		log.info("{} browser initialized successfully", browser);
 	}
 
+	// =========================================================
+	// Browser Configuration
+	// =========================================================
+
 	/**
-	 * Reads and validates browser configuration.
+	 * Gets browser from configuration.
 	 */
 	private static BrowserType getBrowser(ConfigReader config) {
 
@@ -79,34 +86,34 @@ public final class DriverFactory {
 
 			return BrowserType.valueOf(browserName.trim().toUpperCase());
 
-		} catch (IllegalArgumentException e) {
+		} catch (Exception e) {
 
 			throw new IllegalArgumentException(
-					"Unsupported browser: " + browserName + ". Supported browsers: CHROME, FIREFOX, EDGE", e);
+					"Unsupported browser: " + browserName + ". Supported browsers: " + "CHROME, FIREFOX, EDGE", e);
 		}
 	}
 
+	// =========================================================
+	// Driver Creation
+	// =========================================================
+
 	/**
-	 * Creates WebDriver based on selected browser.
+	 * Creates WebDriver based on configured browser.
 	 */
 	private static WebDriver createDriver(BrowserType browser, boolean headless) {
 
 		switch (browser) {
 
 		case CHROME:
-
 			return createChromeDriver(headless);
 
 		case FIREFOX:
-
 			return createFirefoxDriver(headless);
 
 		case EDGE:
-
 			return createEdgeDriver(headless);
 
 		default:
-
 			throw new IllegalArgumentException("Unsupported browser: " + browser);
 		}
 	}
@@ -124,8 +131,6 @@ public final class DriverFactory {
 
 			options.addArguments("--headless=new");
 		}
-
-		options.addArguments("--start-maximized");
 
 		return new ChromeDriver(options);
 	}
@@ -161,25 +166,38 @@ public final class DriverFactory {
 			options.addArguments("--headless=new");
 		}
 
-		options.addArguments("--start-maximized");
-
 		return new EdgeDriver(options);
 	}
+
+	// =========================================================
+	// Common Driver Configuration
+	// =========================================================
 
 	/**
 	 * Applies common WebDriver configuration.
 	 */
-	private static void configureDriver(WebDriver driver, int implicitWait, int pageLoadTimeout) {
+	private static void configureDriver(WebDriver driver, boolean headless, int implicitWait, int pageLoadTimeout) {
 
-		driver.manage().window().maximize();
+		/*
+		 * Maximize only when running with a visible browser. Headless browsers do not
+		 * require maximize().
+		 */
+		if (!headless) {
+
+			driver.manage().window().maximize();
+		}
 
 		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(implicitWait));
 
 		driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(pageLoadTimeout));
 	}
 
+	// =========================================================
+	// Driver Cleanup
+	// =========================================================
+
 	/**
-	 * Quits the current thread's WebDriver.
+	 * Quits WebDriver for the current execution thread.
 	 */
 	public static void quitDriver() {
 

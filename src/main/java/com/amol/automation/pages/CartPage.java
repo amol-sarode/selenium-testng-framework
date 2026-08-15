@@ -3,63 +3,102 @@ package com.amol.automation.pages;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 
+import com.amol.automation.reports.ExtentReportManager;
 import com.amol.automation.utils.ElementUtils;
 import com.amol.automation.utils.LoggerUtils;
 
-/**
- * Page Object class for SauceDemo Cart Page.
- *
- * Contains only cart-page locators and page-level methods.
- */
 public class CartPage {
 
-	private static final Logger log = LoggerUtils.getLogger(CartPage.class);
+    private static final Logger log =
+            LoggerUtils.getLogger(CartPage.class);
 
-	// =========================================================
-	// Locators
-	// =========================================================
+    // =========================================================
+    // Locators
+    // =========================================================
 
-	private final By cartTitle = By.className("title");
+    private final By cartTitle =
+            By.cssSelector(".title");
 
-	private final By productName = By.className("inventory_item_name");
+    private final By productName =
+            By.cssSelector(".inventory_item_name");
 
-	private final By checkoutButton = By.id("checkout");
+    private final By checkoutButton =
+            By.id("checkout");
 
-	// =========================================================
-	// Page Methods
-	// =========================================================
+    // =========================================================
+    // Cart Title
+    // =========================================================
 
-	/**
-	 * Gets the cart page title.
-	 *
-	 * @return cart page title
-	 */
-	public String getCartTitle() {
+    public String getCartTitle() {
 
-		log.info("Getting cart page title");
+        ExtentReportManager.info(
+                "Get Cart page title");
 
-		return ElementUtils.getText(cartTitle);
-	}
+        String title =
+                ElementUtils.getText(cartTitle);
 
-	/**
-	 * Gets the product name displayed in the cart.
-	 *
-	 * @return product name
-	 */
-	public String getProductName() {
+        log.info(
+                "Cart page title : {}",
+                title);
 
-		log.info("Getting product name from cart");
+        return title;
+    }
 
-		return ElementUtils.getText(productName);
-	}
+    // =========================================================
+    // Product Name
+    // =========================================================
 
-	/**
-	 * Clicks the Checkout button.
-	 */
-	public void clickCheckout() {
+    public String getProductName() {
 
-		log.info("Clicking Checkout button");
+        ExtentReportManager.info(
+                "Get product name from Cart");
 
-		ElementUtils.click(checkoutButton);
-	}
+        String name =
+                ElementUtils.getText(productName);
+
+        log.info(
+                "Cart product : {}",
+                name);
+
+        return name;
+    }
+
+    // =========================================================
+    // Checkout
+    // =========================================================
+
+    public void clickCheckout() {
+
+        ExtentReportManager.info(
+                "Click Checkout button");
+
+        try {
+
+            /*
+             * Wait until the Cart page is actually displayed
+             * before clicking Checkout.
+             */
+            ElementUtils.getText(cartTitle);
+
+            /*
+             * Checkout button is on Cart page.
+             */
+            ElementUtils.click(checkoutButton);
+
+            log.info(
+                    "Checkout button clicked successfully");
+
+        } catch (Exception e) {
+
+            log.error(
+                    "Unable to click Checkout button",
+                    e);
+
+            ExtentReportManager.fail(
+                    "Unable to click Checkout button");
+
+            throw e;
+        }
+    }
 }
+
