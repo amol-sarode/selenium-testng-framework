@@ -4,16 +4,20 @@ target/
 # TestNG
 test-output/
 
-# Logs
-logs/
-
 # Reports
 reports/
 
 # Screenshots
 screenshots/
 
+# Logs
+logs/
+
 # Eclipse
 .settings/
 .classpath
 .project
+
+# IDE
+.idea/
+*.iml
