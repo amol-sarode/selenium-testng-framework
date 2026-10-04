@@ -13,12 +13,12 @@
         <classes>
 
             
-            <class name="com.amol.automation.tests.LoginTest">
+           <!-- <class name="com.amol.automation.tests.LoginTest">
                 <methods>
                     <include name="verifyLogin"/>
                     <include name="verifyInvalidLogin"/>
                 </methods>
-            </class>
+            </class>-->
 
          
            <!-- <class name="com.amol.automation.tests.ProductTest">
@@ -33,6 +33,17 @@
                     <include name="verifyEndToEndPurchaseFlow"/>
                 </methods>
             </class>-->
+            
+            <class name="com.amol.automation.tests.CustomerCrudTest">
+                <methods>
+                    <include name="verifyCreateCustomer"/>
+                    <include name="verifyReadCustomer"/>
+                    <include name="verifyUpdateCustomer"/>
+                    <include name="verifyDeleteCustomer"/>
+                </methods>
+            </class>
+            
+            
 
         </classes>
 
