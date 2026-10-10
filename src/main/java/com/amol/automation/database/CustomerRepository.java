@@ -8,7 +8,6 @@ import java.sql.Statement;
 
 import org.apache.logging.log4j.Logger;
 
-import com.amol.automation.base.BaseTest;
 import com.amol.automation.reports.ExtentReportManager;
 import com.amol.automation.utils.LoggerUtils;
 
@@ -20,7 +19,7 @@ import com.amol.automation.utils.LoggerUtils;
  *
  * Assertions must not be added here.
  */
-public class CustomerRepository extends BaseTest{
+public class CustomerRepository {
 
 	private static final Logger log = LoggerUtils.getLogger(CustomerRepository.class);
 

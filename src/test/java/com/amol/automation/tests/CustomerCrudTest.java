@@ -5,7 +5,6 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.amol.automation.actions.DatabaseActions;
-import com.amol.automation.base.BaseTest;
 import com.amol.automation.utils.LoggerUtils;
 
 /**
@@ -18,7 +17,7 @@ import com.amol.automation.utils.LoggerUtils;
  *
  * Test | v DatabaseActions | v CustomerRepository | v DatabaseConnectionManager
  */
-public class CustomerCrudTest extends BaseTest {
+public class CustomerCrudTest {
 
 	private static final Logger log = LoggerUtils.getLogger(CustomerCrudTest.class);
 

@@ -12,168 +12,121 @@ import com.amol.automation.listeners.RetryAnalyzer;
 /**
  * End-to-end test for SauceDemo purchase functionality.
  *
- * Flow:
- * Login -> Products -> Add Product -> Cart
- * -> Checkout -> Complete Order -> Back To Products
+ * Flow: Login -> Products -> Add Product -> Cart -> Checkout -> Complete Order
+ * -> Back To Products
  *
  * Architecture:
  *
- * Test
- *   -> LoginActions
- *   -> EndToEndActions
+ * Test -> LoginActions -> EndToEndActions
  *
- * Assertions remain in Test layer.
- * Business operations remain in Action layer.
+ * Assertions remain in Test layer. Business operations remain in Action layer.
  * UI operations remain in Page layer.
  */
 public class EndToEndTest extends BaseTest {
 
-    private final LoginActions loginActions =
-            ActionObjectManager.getLoginActions();
+	private final LoginActions loginActions = ActionObjectManager.getLoginActions();
 
-    private final EndToEndActions endToEndActions =
-            new EndToEndActions();
+	private final EndToEndActions endToEndActions = new EndToEndActions();
 
-    @Test(
-        description = "Verify complete SauceDemo purchase flow with valid user",
-        groups = {"smoke", "regression"},
-        retryAnalyzer = RetryAnalyzer.class
-    )
-    public void verifyEndToEndPurchaseFlow() {
+	@Test(description = "Verify complete SauceDemo purchase flow with valid user", groups = { "smoke",
+			"regression" }, retryAnalyzer = RetryAnalyzer.class)
+	public void verifyEndToEndPurchaseFlow() {
 
-        // =====================================================
-        // Test Data
-        // =====================================================
+		// =====================================================
+		// Test Data
+		// =====================================================
 
-        String username = "standard_user";
-        String password = "secret_sauce";
+		String username = "standard_user";
+		String password = "secret_sauce";
 
-        String firstName = "Amol";
-        String lastName = "Sarode";
-        String postalCode = "382481";
+		String firstName = "Amol";
+		String lastName = "Sarode";
+		String postalCode = "382481";
 
-        String productName = "Sauce Labs Backpack";
+		String productName = "Sauce Labs Backpack";
 
-        // =====================================================
-        // Login
-        // =====================================================
+		// =====================================================
+		// Login
+		// =====================================================
 
-        loginActions.login(username, password);
+		loginActions.login(username, password);
 
-        // =====================================================
-        // Verify Successful Login
-        // =====================================================
+		// =====================================================
+		// Verify Successful Login
+		// =====================================================
 
-        String productsTitle =
-                endToEndActions.getProductsPageTitle();
+		String productsTitle = endToEndActions.getProductsPageTitle();
 
-        Assert.assertEquals(
-                productsTitle,
-                "Products",
-                "Login successful but Products page was not displayed"
-        );
+		Assert.assertEquals(productsTitle, "Products", "Login successful but Products page was not displayed");
 
-        // =====================================================
-        // Add Product
-        // =====================================================
+		// =====================================================
+		// Add Product
+		// =====================================================
 
-        endToEndActions.addProduct(productName);
+		endToEndActions.addProduct(productName);
 
-        // =====================================================
-        // Cart Count
-        // =====================================================
+		// =====================================================
+		// Cart Count
+		// =====================================================
 
-        Assert.assertEquals(
-                endToEndActions.getCartCount(),
-                "1",
-                "Cart count is not updated correctly"
-        );
+		Assert.assertEquals(endToEndActions.getCartCount(), "1", "Cart count is not updated correctly");
 
-        // =====================================================
-        // Open Cart
-        // =====================================================
+		// =====================================================
+		// Open Cart
+		// =====================================================
 
-        endToEndActions.openCart();
+		endToEndActions.openCart();
 
-        // =====================================================
-        // Cart Verification
-        // =====================================================
+		// =====================================================
+		// Cart Verification
+		// =====================================================
 
-        Assert.assertEquals(
-                endToEndActions.getCartTitle(),
-                "Products",
-                "Cart page title mismatch"
-        );
+		Assert.assertEquals(endToEndActions.getCartTitle(), "Your Cart", "Cart page title mismatch");
 
-        Assert.assertEquals(
-                endToEndActions.getCartProductName(),
-                productName,
-                "Incorrect product found in cart"
-        );
+		Assert.assertEquals(endToEndActions.getCartProductName(), productName, "Incorrect product found in cart");
 
-        // =====================================================
-        // Checkout
-        // =====================================================
+		// =====================================================
+		// Checkout
+		// =====================================================
 
-        endToEndActions.proceedToCheckout();
+		endToEndActions.proceedToCheckout();
 
-        Assert.assertEquals(
-                endToEndActions.getCheckoutTitle(),
-                "Your Cart",
-                "Checkout information page mismatch"
-        );
+		Assert.assertEquals(endToEndActions.getCheckoutTitle(), "Checkout: Your Information", "Checkout information page mismatch");
 
-        // =====================================================
-        // Checkout Information
-        // =====================================================
+		// =====================================================
+		// Checkout Information
+		// =====================================================
 
-        endToEndActions.enterCheckoutInformation(
-                firstName,
-                lastName,
-                postalCode
-        );
+		endToEndActions.enterCheckoutInformation(firstName, lastName, postalCode);
 
-        endToEndActions.continueCheckout();
+		endToEndActions.continueCheckout();
 
-        // =====================================================
-        // Checkout Overview
-        // =====================================================
+		// =====================================================
+		// Checkout Overview
+		// =====================================================
 
-        Assert.assertEquals(
-                endToEndActions.getOverviewTitle(),
-                "Checkout: Overview",
-                "Checkout overview page mismatch"
-        );
+		Assert.assertEquals(endToEndActions.getOverviewTitle(), "Checkout: Overview",
+				"Checkout overview page mismatch");
 
-        // =====================================================
-        // Complete Order
-        // =====================================================
+		// =====================================================
+		// Complete Order
+		// =====================================================
 
-        endToEndActions.finishOrder();
+		endToEndActions.finishOrder();
 
-        Assert.assertEquals(
-                endToEndActions.getCompletePageTitle(),
-                "Checkout: Complete!",
-                "Checkout complete page title mismatch"
-        );
+		Assert.assertEquals(endToEndActions.getCompletePageTitle(), "Checkout: Complete!",
+				"Checkout complete page title mismatch");
 
-        Assert.assertEquals(
-                endToEndActions.getThankYouMessage(),
-                "Thank you for your order!",
-                "Order confirmation message mismatch"
-        );
+		Assert.assertEquals(endToEndActions.getThankYouMessage(), "Thank you for your order!",
+				"Order confirmation message mismatch");
 
-        // =====================================================
-        // Back To Products
-        // =====================================================
+		// =====================================================
+		// Back To Products
+		// =====================================================
 
-        endToEndActions.backToProducts();
+		endToEndActions.backToProducts();
 
-        Assert.assertEquals(
-                endToEndActions.getProductsPageTitle(),
-                "Products",
-                "User is not redirected to Products page"
-        );
-    }
+		Assert.assertEquals(endToEndActions.getProductsPageTitle(), "Products",
+				"User is not redirected to Products page");
+	}
 }
-

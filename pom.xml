@@ -135,6 +135,15 @@
 			<version>13.6.0.jre11</version>
 		</dependency>
 
+		<!-- RestAssured API Automation -->
+
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>rest-assured</artifactId>
+			<version>5.5.0</version>
+		</dependency>
+
+
 	</dependencies>
 
 

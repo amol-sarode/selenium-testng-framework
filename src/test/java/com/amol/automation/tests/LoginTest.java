@@ -50,11 +50,8 @@ public class LoginTest extends BaseTest {
     )
     public void verifyInvalidLogin() {
 
-        String[] loginData = ExcelUtils.getRowData(
-                FrameworkConstants.LOGIN_EXCEL_FILE,
-                FrameworkConstants.LOGIN_SHEET,
-                3
-        );
+		String[] loginData = ExcelUtils.getRowData(
+				FrameworkConstants.LOGIN_EXCEL_FILE, FrameworkConstants.LOGIN_SHEET,3);
 
         String username = loginData[1];
         String password = loginData[2];

@@ -1,6 +1,7 @@
 package com.amol.automation.driver;
 
 import java.time.Duration;
+import java.util.Map;
 
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.WebDriver;
@@ -10,7 +11,7 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
-
+import java.util.HashMap;
 import com.amol.automation.enums.BrowserType;
 import com.amol.automation.utils.ConfigReader;
 import com.amol.automation.utils.LoggerUtils;
@@ -75,7 +76,6 @@ public final class DriverFactory {
 	// Browser Configuration
 	// =========================================================
 
-	
 	/**
 	 * Gets browser from configuration.
 	 */
@@ -122,14 +122,22 @@ public final class DriverFactory {
 	/**
 	 * Creates ChromeDriver.
 	 */
+
 	private static WebDriver createChromeDriver(boolean headless) {
 
 		WebDriverManager.chromedriver().setup();
 
 		ChromeOptions options = new ChromeOptions();
 
-		if (headless) {
+		// Disable Chrome password manager and password-leak popups
+		Map<String, Object> prefs = new HashMap<>();
+		prefs.put("credentials_enable_service", false);
+		prefs.put("profile.password_manager_enabled", false);
+		prefs.put("profile.password_manager_leak_detection", false);
 
+		options.setExperimentalOption("prefs", prefs);
+
+		if (headless) {
 			options.addArguments("--headless=new");
 		}
 
