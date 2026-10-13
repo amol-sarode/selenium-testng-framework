@@ -56,7 +56,7 @@ public final class FrameworkConstants {
     // =========================================================
 
     public static final String TEST_DATA_FOLDER =
-            "src/main/resources/testdata/";
+            "src/test/resources/testdata/";
 
     public static final String LOGIN_EXCEL_FILE =
             TEST_DATA_FOLDER + "LoginData.xlsx";

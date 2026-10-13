@@ -1,9 +1,11 @@
 
-package com.amol.automation.api;
+package com.amol.automation.tests.api;
 
 import org.apache.logging.log4j.Logger;
 import org.testng.annotations.Test;
 
+import com.amol.automation.api.BookingApiClient;
+import com.amol.automation.api.BookingRequest;
 import com.amol.automation.reports.ExtentReportManager;
 import com.amol.automation.utils.LoggerUtils;
 import com.amol.automation.utils.PayloadUtils;

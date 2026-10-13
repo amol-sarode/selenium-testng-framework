@@ -1,4 +1,4 @@
-package com.amol.automation.dataprovider;
+package com.amol.automation.dataproviders;
 
 import org.testng.annotations.DataProvider;
 

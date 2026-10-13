@@ -1,275 +1,336 @@
 # Selenium TestNG Automation Framework
 
-A scalable and maintainable **UI test automation framework** built using **Java, Selenium WebDriver, TestNG, Maven, and Extent Reports**.
+A maintainable, multi-layered test automation framework built using **Java 17, Selenium WebDriver, TestNG, REST Assured, JDBC, Maven, and Extent Reports**.
 
-The framework follows a layered architecture that separates **test cases, business actions, page objects, driver management, reporting, test data, and utilities**, making the project easier to maintain, extend, debug, and present in an enterprise automation environment.
+This framework combines **UI automation, REST API automation, and database testing** in a single Maven project. It follows a modular architecture that separates test cases, business workflows, page objects, API clients, database operations, configuration, test data, logging, and reporting.
+
+The project demonstrates practical automation engineering concepts suitable for real-world testing and SDET interview preparation.
 
 ---
 
 ## 📌 Project Overview
 
-This framework is designed for automating web applications using Selenium WebDriver with TestNG.
+The framework is designed to automate web application workflows, validate REST APIs, and perform database CRUD operations.
 
-It provides:
+### Key Features
 
-* Page Object Model (POM)
-* Action/business layer
-* Centralized WebDriver management
-* Thread-safe driver handling
-* TestNG test execution
-* TestNG groups
-* Retry mechanism
-* External test data support
-* Excel and JSON test data utilities
-* Centralized configuration
-* Logging using Log4j2
-* Extent HTML reporting
-* Failure screenshots
-* Multi-browser support
-* Headless execution support
-* Maven-based build management
-* Parallel-execution-ready architecture
+- UI automation using Selenium WebDriver and Page Object Model (POM).
+- Business action layer for reusable UI workflows.
+- REST API automation using REST Assured.
+- POJO-based API request models and JSON test data.
+- Database automation using JDBC and Microsoft SQL Server.
+- CRUD operations for create, read, update, and delete scenarios.
+- Centralized WebDriver management using `ThreadLocal<WebDriver>`.
+- Page Object and Action Object managers.
+- TestNG annotations, groups, data providers, and listeners.
+- Retry mechanism for configured transient test failures.
+- Centralized Extent HTML reporting.
+- Log4j2-based logging.
+- Failure screenshots for applicable UI test failures.
+- Excel and JSON test data utilities.
+- Centralized framework configuration.
+- Maven-based build and dependency management.
+- Separate TestNG suites for UI, API, and database tests.
+- Reusable framework utilities and shared reporting components.
 
 ---
 
 ## 🛠️ Technology Stack
 
-| Technology         | Purpose                         |
-| ------------------ | ------------------------------- |
-| Java 17            | Programming language            |
-| Selenium WebDriver | Web UI automation               |
-| TestNG             | Test execution and assertions   |
-| Maven              | Dependency and build management |
-| WebDriverManager   | Browser driver management       |
-| Extent Reports     | HTML execution reporting        |
-| Log4j2             | Application/framework logging   |
-| Apache POI         | Excel test-data handling        |
-| JSON               | Test-data management            |
-| Git/GitHub         | Version control                 |
+| Technology | Purpose |
+|---|---|
+| Java 17 | Programming language |
+| Selenium WebDriver | Web UI automation |
+| TestNG | Test execution, assertions, groups, listeners, and data providers |
+| REST Assured | REST API automation |
+| JDBC | Database connectivity |
+| Microsoft SQL Server JDBC Driver | SQL Server connectivity |
+| Maven | Build and dependency management |
+| WebDriverManager | Browser driver management |
+| Extent Reports | HTML execution reporting |
+| Log4j2 | Framework logging |
+| Apache POI | Excel test-data handling |
+| Jackson | JSON serialization and deserialization |
+| JSON | API payloads and external test data |
+| Git and GitHub | Version control and source-code hosting |
 
 ---
 
 ## 🏗️ Framework Architecture
 
-The framework follows a layered architecture:
+The framework uses separate layers for UI, API, and database automation, with shared infrastructure for reporting, configuration, logging, and test execution.
 
 ```text
-                    ┌──────────────────────┐
-                    │      Test Layer      │
-                    │   TestNG Test Cases  │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │    Action Layer      │
-                    │ Business Workflows   │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │     Page Layer       │
-                    │   Page Objects       │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │   Selenium WebDriver │
-                    └──────────────────────┘
+                   TestNG Test Layer
+                           |
+             +-------------+-------------+
+             |             |             |
+             v             v             v
+         UI Tests       API Tests       DB Tests
+             |             |             |
+             v             v             v
+       Action Layer    API Client    Repository Layer
+             |             |             |
+             v             v             v
+        Page Objects   REST Assured      JDBC
+             |             |             |
+             v             v             v
+        WebDriver     REST API       SQL Server
+
+       Shared Framework Services
+       -------------------------
+       Configuration | Logging
+       Extent Reports | Test Data
+       Listeners | Utilities
 ```
 
 ### Layer Responsibilities
 
 **Test Layer**
 
-Responsible for:
+- Defines test scenarios and business expectations.
+- Uses TestNG annotations, groups, and data providers.
+- Performs high-level assertions.
+- Executes UI, API, and database test cases through their respective layers.
 
-* Defining test scenarios
-* TestNG annotations
-* Test groups
-* Test data invocation
-* High-level assertions
+**UI Action Layer**
 
-**Action Layer**
+- Implements reusable business workflows.
+- Combines multiple page operations.
+- Keeps test cases readable.
+- Creates logical reporting nodes where required.
 
-Responsible for:
+**Page Object Layer**
 
-* Business workflows
-* Combining multiple page operations
-* Keeping test cases readable
-* Creating logical reporting nodes where required
+- Stores page-specific locators.
+- Performs UI interactions.
+- Returns relevant UI state and data.
+- Avoids business-level assertions and test-flow responsibilities.
 
-**Page Layer**
+**API Layer**
 
-Responsible for:
+- Centralizes API specifications and reusable request configuration.
+- Uses API clients to execute endpoint operations.
+- Supports POJO-based request models and external JSON payloads.
+- Keeps API request execution separate from TestNG assertions.
 
-* Locators
-* Web element interactions
-* Page-specific UI operations
-* Returning UI state/data
+**Database Layer**
 
-Page Objects do not contain test assertions or business-level test flow.
+- Centralizes database connectivity.
+- Encapsulates reusable SQL operations in repository classes.
+- Supports database CRUD scenarios.
+- Separates SQL execution from test assertions.
 
-**Driver Layer**
+**Shared Framework Services**
 
-Responsible for:
-
-* WebDriver creation
-* Browser configuration
-* Thread-safe driver management
-* Browser lifecycle
+- Centralized configuration and constants.
+- Logging and Extent reporting.
+- Test listeners and retry handling.
+- Reusable Excel, JSON, wait, and other utilities.
 
 ---
 
 ## 📂 Project Structure
 
+The following structure reflects the current project organization.
+
 ```text
 selenium-testng-framework/
 │
+├── pom.xml
+├── README.md
+├── .gitignore
+│
 ├── src/
-│   │
 │   ├── main/
-│   │   ├── java/
-│   │   │   └── com/amol/automation/
-│   │   │       │
-│   │   │       ├── actions/
-│   │   │       │   ├── EndToEndActions.java
-│   │   │       │   ├── LoginActions.java
-│   │   │       │   └── ProductActions.java
-│   │   │       │
-│   │   │       ├── base/
-│   │   │       │   └── BaseTest.java
-│   │   │       │
-│   │   │       ├── constants/
-│   │   │       │   └── FrameworkConstants.java
-│   │   │       │
-│   │   │       ├── driver/
-│   │   │       │   ├── DriverFactory.java
-│   │   │       │   └── DriverManager.java
-│   │   │       │
-│   │   │       ├── enums/
-│   │   │       │   ├── BrowserType.java
-│   │   │       │   └── Environment.java
-│   │   │       │
-│   │   │       ├── factory/
-│   │   │       │   ├── ActionObjectManager.java
-│   │   │       │   └── PageObjectManager.java
-│   │   │       │
-│   │   │       ├── listeners/
-│   │   │       │   ├── RetryAnalyzer.java
-│   │   │       │   └── TestListener.java
-│   │   │       │
-│   │   │       ├── pages/
-│   │   │       │   ├── CartPage.java
-│   │   │       │   ├── CheckoutCompletePage.java
-│   │   │       │   ├── CheckoutOverviewPage.java
-│   │   │       │   ├── CheckoutPage.java
-│   │   │       │   ├── HomePage.java
-│   │   │       │   ├── LoginPage.java
-│   │   │       │   └── ProductPage.java
-│   │   │       │
-│   │   │       ├── reports/
-│   │   │       │   └── ExtentReportManager.java
-│   │   │       │
-│   │   │       └── utils/
-│   │   │           ├── ConfigReader.java
-│   │   │           ├── DateUtil.java
-│   │   │           ├── ElementUtils.java
-│   │   │           ├── ExcelUtils.java
-│   │   │           ├── JavaScriptUtil.java
-│   │   │           ├── JsonUtils.java
-│   │   │           ├── LoggerUtils.java
-│   │   │           ├── ScreenshotUtils.java
-│   │   │           └── WaitUtils.java
+│   │   ├── java/com/amol/automation/
+│   │   │   ├── actions/
+│   │   │   │   ├── DatabaseActions.java
+│   │   │   │   ├── EndToEndActions.java
+│   │   │   │   ├── LoginActions.java
+│   │   │   │   └── ProductActions.java
+│   │   │   │
+│   │   │   ├── api/
+│   │   │   │   ├── ApiSpecification.java
+│   │   │   │   ├── BookingApiClient.java
+│   │   │   │   └── BookingRequest.java
+│   │   │   │
+│   │   │   ├── base/
+│   │   │   │   └── BaseTest.java
+│   │   │   │
+│   │   │   ├── constants/
+│   │   │   │   └── FrameworkConstants.java
+│   │   │   │
+│   │   │   ├── database/
+│   │   │   │   ├── CustomerRepository.java
+│   │   │   │   └── DatabaseConnectionManager.java
+│   │   │   │
+│   │   │   ├── driver/
+│   │   │   │   ├── DriverFactory.java
+│   │   │   │   └── DriverManager.java
+│   │   │   │
+│   │   │   ├── enums/
+│   │   │   │   ├── BrowserType.java
+│   │   │   │   └── Environment.java
+│   │   │   │
+│   │   │   ├── factory/
+│   │   │   │   ├── ActionObjectManager.java
+│   │   │   │   └── PageObjectManager.java
+│   │   │   │
+│   │   │   ├── listeners/
+│   │   │   │   ├── RetryAnalyzer.java
+│   │   │   │   └── TestListener.java
+│   │   │   │
+│   │   │   ├── pages/
+│   │   │   │   ├── CartPage.java
+│   │   │   │   ├── CheckoutCompletePage.java
+│   │   │   │   ├── CheckoutOverviewPage.java
+│   │   │   │   ├── CheckoutPage.java
+│   │   │   │   ├── HomePage.java
+│   │   │   │   ├── LoginPage.java
+│   │   │   │   └── ProductPage.java
+│   │   │   │
+│   │   │   ├── reports/
+│   │   │   │   └── ExtentReportManager.java
+│   │   │   │
+│   │   │   └── utils/
+│   │   │       ├── ConfigReader.java
+│   │   │       ├── DateUtil.java
+│   │   │       ├── ElementUtils.java
+│   │   │       ├── ExcelUtils.java
+│   │   │       ├── JavaScriptUtil.java
+│   │   │       ├── JsonUtils.java
+│   │   │       ├── LoggerUtils.java
+│   │   │       ├── PayloadUtils.java
+│   │   │       ├── ScreenshotUtils.java
+│   │   │       └── WaitUtils.java
 │   │   │
 │   │   └── resources/
-│   │       ├── testdata/
-│   │       │   ├── LoginData.xlsx
-│   │       │   ├── ProductData.json
-│   │       │   └── Users.json
-│   │       │
-│   │       ├── config.properties
-│   │       └── log4j2.xml
 │   │
 │   └── test/
-│       └── java/
-│           └── com/amol/automation/
-│               ├── dataprovider/
-│               │   └── TestDataProvider.java
-│               │
-│               └── tests/
-│                   ├── EndToEndTest.java
-│                   ├── LoginTest.java
-│                   └── ProductTest.java
+│       ├── java/com/amol/automation/
+│       │   ├── dataproviders/
+│       │   │   └── TestDataProvider.java
+│       │   │
+│       │   └── tests/
+│       │       ├── CustomerCrudTest.java
+│       │       ├── DatabaseConnectionTest.java
+│       │       ├── EndToEndTest.java
+│       │       ├── LoginTest.java
+│       │       ├── ProductTest.java
+│       │       └── api/
+│       │           └── BookingTest.java
+│       │
+│       └── resources/
+│           ├── config.properties
+│           ├── log4j2.xml
+│           │
+│           ├── testdata/
+│           │   ├── booking-data.json
+│           │   ├── LoginData.xlsx
+│           │   ├── ProductData.json
+│           │   └── Users.json
+│           │
+│           └── testng/
+│               ├── testng-api.xml
+│               ├── testng-db.xml
+│               └── testng-ui.xml
 │
-├── .gitignore
-├── pom.xml
-└── README.md
+└── Generated files and IDE metadata
+    ├── logs/
+    ├── reports/
+    ├── screenshots/
+    ├── target/
+    └── test-output/
 ```
+
+*Note: Generated directories and IDE metadata may exist locally but should generally be excluded from version control.*
 
 ---
 
 ## 🧩 Core Components
 
-### DriverFactory
+### 1. UI Automation
 
-Creates and configures WebDriver instances.
+**DriverFactory**
 
-Supported browsers include:
+Creates and configures WebDriver instances. Browser-specific options can include headless execution and timeout settings.
 
-* Chrome
-* Firefox
-* Edge
+**DriverManager**
 
-Browser configuration can include:
+Manages WebDriver instances using `ThreadLocal<WebDriver>` to isolate driver references across execution threads.
 
-* Headless execution
-* Page-load timeout
-* Implicit wait
-* Browser-specific options
+**PageObjectManager**
 
-### DriverManager
+Centralizes the creation and access of page objects.
 
-Uses `ThreadLocal<WebDriver>` to provide thread-safe driver management and support parallel execution.
+**ActionObjectManager**
 
-### PageObjectManager
+Provides centralized access to reusable business action classes.
 
-Centralizes Page Object creation and lifecycle management.
+**BaseTest**
 
-### ActionObjectManager
+Provides common test setup and teardown for UI test execution, including browser initialization and cleanup.
 
-Centralizes Action object creation and provides a consistent way for test classes to access business workflows.
+**Page Objects**
 
-### BaseTest
+Encapsulate page locators and UI operations for login, products, cart, checkout, and order completion.
 
-Provides common test lifecycle management such as:
+### 2. API Automation
 
-```text
-Before Suite
-     ↓
-Initialize reporting
-     ↓
-Before Method
-     ↓
-Initialize WebDriver
-     ↓
-Execute Test
-     ↓
-Capture failure information
-     ↓
-Quit WebDriver
-     ↓
-After Suite
-     ↓
-Flush report
-```
+The API layer uses REST Assured to interact with REST endpoints.
+
+| Component | Responsibility |
+|---|---|
+| `ApiSpecification.java` | Centralized API request specification |
+| `BookingApiClient.java` | Reusable booking API operations |
+| `BookingRequest.java` | POJO representation of a booking request |
+| `PayloadUtils.java` | Loads and maps JSON test data |
+| `BookingTest.java` | Executes API scenarios and validates expected results |
+
+API test data is maintained separately from test implementation, allowing payloads to be reused and maintained independently.
+
+### 3. Database Automation
+
+The database layer uses JDBC to connect to Microsoft SQL Server.
+
+| Component | Responsibility |
+|---|---|
+| `DatabaseConnectionManager.java` | Creates and manages database connections |
+| `CustomerRepository.java` | Encapsulates customer database operations |
+| `DatabaseActions.java` | Provides an optional reusable workflow layer for database actions |
+| `DatabaseConnectionTest.java` | Validates database connectivity |
+| `CustomerCrudTest.java` | Tests customer CRUD scenarios |
+
+Database operations are kept separate from TestNG assertions so that SQL execution and test validation remain independently maintainable.
+
+### 4. Reporting and Logging
+
+**TestListener**
+
+Handles TestNG lifecycle events and integrates test execution with reporting.
+
+**ExtentReportManager**
+
+Manages the Extent Reports instance, test entries, reporting nodes, status logging, and report flushing.
+
+**LoggerUtils**
+
+Provides centralized Log4j2 logger access.
+
+**ScreenshotUtils**
+
+Provides screenshot functionality for applicable UI failures.
+
+Reporting is centralized to avoid duplicating lifecycle and reporting logic in individual test classes.
 
 ---
 
-## 📊 Reporting
+## 📊 Extent Reporting
 
-The framework uses **Extent Reports** for execution reporting.
+The framework uses Extent Reports to generate HTML execution reports.
 
-The reporting architecture is designed around:
+The reporting hierarchy is designed around a parent test and logical child nodes:
 
 ```text
 Test
@@ -279,137 +340,116 @@ Test
       └── FAIL
 ```
 
-The TestNG listener is responsible for creating the parent test automatically using the TestNG test description.
-
-Example:
+Example TestNG method:
 
 ```java
-@Test(description = "Verify product add to cart with valid user")
+@Test(
+    description = "Verify product add to cart with valid user",
+    groups = {"smoke", "regression"}
+)
 public void verifyAddToCart() {
-    // test implementation
+    // Execute workflow and validate expected behavior
 }
 ```
 
-The reporting layer can create the corresponding test automatically instead of requiring every test class to manually create an Extent test.
+The listener creates the parent test entry using TestNG metadata. Action or API workflow components can create logical reporting nodes where required.
 
 ### Reporting Responsibilities
 
-| Component             | Responsibility                      |
-| --------------------- | ----------------------------------- |
-| `TestListener`        | Test lifecycle and reporting events |
-| `ExtentReportManager` | Extent report management            |
-| `BaseTest`            | Framework lifecycle                 |
-| `ScreenshotUtils`     | Failure screenshots                 |
-
-This keeps reporting implementation centralized instead of duplicating it across test classes.
+| Component | Responsibility |
+|---|---|
+| `TestListener` | Test lifecycle events and final execution status |
+| `ExtentReportManager` | Extent report and node management |
+| `BaseTest` | Common UI test lifecycle |
+| `ScreenshotUtils` | Screenshot capture |
+| `LoggerUtils` | Framework logging |
 
 ---
 
 ## 🔄 Retry Mechanism
 
-The framework contains a TestNG retry mechanism through:
+The framework includes a TestNG retry mechanism through `RetryAnalyzer.java`.
 
-```text
-RetryAnalyzer.java
-```
+Retry can be useful for configured transient failures, such as:
 
-The retry mechanism can be used for transient failures such as:
+- Temporary browser issues.
+- Intermittent network failures.
+- Timing or synchronization problems.
 
-* Temporary browser issues
-* Network instability
-* Application timing issues
-* Unexpected UI synchronization problems
-
-Retry should be used carefully and should not hide genuine application defects.
+Retries should be limited and monitored carefully. They should not hide application defects or replace proper synchronization and root-cause analysis.
 
 ---
 
 ## 🧪 Test Data Management
 
-The framework supports external test data.
-
-### Excel
-
-Excel data is maintained using:
+External test data is maintained under:
 
 ```text
-LoginData.xlsx
+src/test/resources/testdata/
 ```
 
-Excel operations are handled through:
+### Excel Test Data
 
-```text
-ExcelUtils.java
-```
+`LoginData.xlsx` stores login test data.
 
-### JSON
+`ExcelUtils.java` provides reusable Excel-reading functionality using Apache POI.
 
-JSON-based test data is supported through:
+### JSON Test Data
 
-```text
-ProductData.json
-Users.json
-```
+JSON files support UI and API test data, including:
 
-JSON operations are handled through:
+- `booking-data.json`
+- `ProductData.json`
+- `Users.json`
 
-```text
-JsonUtils.java
-```
+`JsonUtils.java` supports JSON utilities, while `PayloadUtils.java` supports loading and mapping API payloads to Java request models.
 
-This keeps test data separate from test implementation.
+Separating test data from test implementation makes test scenarios easier to update and reuse.
 
 ---
 
-## ⚙️ Configuration
+## ⚙️ Configuration Management
 
 Framework configuration is maintained in:
 
 ```text
-src/main/resources/config.properties
+src/test/resources/config.properties
 ```
 
-Configuration can be used for values such as:
+The configuration file can hold non-secret settings such as:
 
-```text
-browser
-environment
-headless
-application URL
-timeouts
-```
+- Application URL.
+- Browser selection.
+- Execution mode.
+- Environment.
+- Headless execution.
+- Wait and page-load timeouts.
+- API base URL and timeout settings.
+- Database connection properties.
 
-Centralized configuration avoids hardcoding environment-specific values throughout the framework.
+`ConfigReader.java` provides centralized configuration access.
+
+Sensitive credentials should be supplied through environment variables or a secure secrets mechanism rather than committed to the repository.
 
 ---
 
 ## 🌐 Browser Support
 
-The framework supports:
+The UI framework is designed to support:
 
-```text
-Chrome
-Firefox
-Edge
-```
+- Google Chrome.
+- Mozilla Firefox.
+- Microsoft Edge.
 
-Browser selection is controlled through the framework configuration/enums.
+Browser selection is controlled through framework configuration and the browser enum.
 
-The framework also supports headless execution where required.
+Headless execution can be enabled when supported by the configured browser options.
 
 ---
 
-## 🧵 Parallel Execution
+## 🧵 Thread Safety and Parallel Execution
 
-The framework is designed with parallel execution in mind.
-
-`DriverManager` uses:
-
-```java
-ThreadLocal<WebDriver>
-```
-
-This allows each TestNG execution thread to maintain its own WebDriver instance.
+`DriverManager` uses `ThreadLocal<WebDriver>` to maintain a separate driver reference for each execution thread.
 
 Conceptually:
 
@@ -419,116 +459,64 @@ Thread 2 → WebDriver 2
 Thread 3 → WebDriver 3
 ```
 
-This prevents WebDriver instances from being shared incorrectly between parallel tests.
+This reduces the risk of different tests accidentally sharing a WebDriver instance.
 
----
-
-## 📝 TestNG
-
-The framework uses TestNG for:
-
-* Test execution
-* Assertions
-* Test lifecycle
-* Groups
-* Data providers
-* Listeners
-* Retry mechanism
-* Parallel execution
-
-TestNG configuration is maintained in:
-
-```text
-src/main/resources/testng/testng.xml
-```
-
-Example groups:
-
-```java
-@Test(
-    description = "Verify product add to cart with valid user",
-    groups = {"smoke", "regression"}
-)
-```
+Actual parallel execution should be enabled only after validating thread safety across reporting, object managers, test data, database operations, and shared resources.
 
 ---
 
 ## 🧪 Test Scenarios
 
-The current framework contains test scenarios covering:
+### UI Automation
 
-### Login
+**Login tests**
 
-```text
-LoginTest.java
-```
+- Validate login-related scenarios.
+- Use external Excel test data where configured.
 
-Validates login-related functionality.
+**Product tests**
 
-### Product
+- Validate product-related workflows, including adding products to the cart.
 
-```text
-ProductTest.java
-```
+**End-to-end tests**
 
-Validates product-related functionality such as adding products to the cart.
+- Validate business flows across login, product selection, cart, and checkout pages.
 
-### End-to-End
+### API Automation
 
-```text
-EndToEndTest.java
-```
+**Booking API tests**
 
-Covers complete business flows across multiple application pages.
+- Create a booking using an external JSON payload.
+- Validate HTTP status and relevant response fields.
+- Extend coverage with read, update, delete, and negative scenarios as those tests are implemented and verified.
 
----
+### Database Automation
 
-## 🧱 Design Principles
+**Database connection test**
 
-The framework follows these principles:
+- Validate connectivity to the configured SQL Server database.
 
-### Single Responsibility
+**Customer CRUD tests**
 
-Each component has a specific responsibility.
+- Exercise customer create, read, update, and delete operations.
+- Validate expected database results.
 
-### Separation of Concerns
-
-Test logic, business actions, UI interactions, reporting, driver management, and utilities are separated.
-
-### Reusability
-
-Common functionality is centralized in reusable managers and utilities.
-
-### Maintainability
-
-Changes to locators, browser configuration, reporting, or utilities can be made without unnecessarily modifying test cases.
-
-### Scalability
-
-The architecture is designed to allow additional:
-
-* Pages
-* Actions
-* Tests
-* Browsers
-* Environments
-* Test data
-* Reporting features
-
-without restructuring the entire framework.
+Database tests should use isolated test records and clean up test-created data where appropriate.
 
 ---
 
-## 🚀 How to Run the Framework
+## 🚀 Getting Started
 
 ### Prerequisites
 
-Install:
+Install the following:
 
-* Java 17+
-* Maven
-* Git
-* Chrome/Firefox/Edge as required
+- Java JDK 17 or later.
+- Apache Maven.
+- Git.
+- A supported browser for UI automation.
+- Access to the configured API for API tests.
+- SQL Server and valid connection settings for database tests.
 
 Verify Java:
 
@@ -542,67 +530,94 @@ Verify Maven:
 mvn -version
 ```
 
----
-
-## 📥 Clone the Repository
+### Clone the Repository
 
 ```bash
 git clone https://github.com/amol-sarode/selenium-testng-framework.git
-```
-
-Navigate to the project:
-
-```bash
 cd selenium-testng-framework
 ```
 
----
-
-## 📦 Install Dependencies
+### Build the Project
 
 ```bash
-mvn clean install
+mvn clean test-compile
 ```
 
----
+This compiles the project and test sources without requiring all test suites to run.
 
-## ▶️ Run Tests
-
-Run the complete test suite:
+### Run the Configured Maven Test Suite
 
 ```bash
 mvn test
 ```
 
-Run the TestNG suite:
-
-```bash
-mvn test -DsuiteXmlFile=src/main/resources/testng/testng.xml
-```
+The default suite is determined by the Maven Surefire configuration in `pom.xml`.
 
 ---
 
-## 🏷️ Run TestNG Groups
+## ▶️ Run Individual TestNG Suites
 
-For example:
+The framework maintains separate suite files under:
+
+```text
+src/test/resources/testng/
+```
+
+### Run UI Tests
+
+```bash
+mvn test -DsuiteXmlFile=src/test/resources/testng/testng-ui.xml
+```
+
+### Run API Tests
+
+```bash
+mvn test -DsuiteXmlFile=src/test/resources/testng/testng-api.xml
+```
+
+### Run Database Tests
+
+```bash
+mvn test -DsuiteXmlFile=src/test/resources/testng/testng-db.xml
+```
+
+These commands assume `pom.xml` is configured to pass the `suiteXmlFile` system property to TestNG. If Surefire uses a hardcoded suite path instead, update that configuration or run the appropriate suite through the IDE.
+
+---
+
+## 🏷️ TestNG Groups
+
+TestNG groups can be used to organize scenarios, for example:
+
+```java
+@Test(
+    description = "Verify product add to cart with valid user",
+    groups = {"smoke", "regression"}
+)
+public void verifyAddToCart() {
+    // Test implementation
+}
+```
+
+Run a group using Maven:
 
 ```bash
 mvn test -Dgroups=smoke
 ```
 
-or:
+Or:
 
 ```bash
 mvn test -Dgroups=regression
 ```
 
+Group execution depends on how Maven Surefire and the selected TestNG suite are configured. Confirm that the desired suite does not override or exclude the requested groups.
+
 ---
 
-## 📋 Logs, Reports and Screenshots
+## 📋 Logs, Reports, and Screenshots
 
-Execution-generated artifacts are intentionally **not committed to GitHub**.
-
-The framework can generate:
+The framework can generate execution artifacts in directories such as:
 
 ```text
 logs/
@@ -612,66 +627,60 @@ test-output/
 target/
 ```
 
-These directories are ignored using `.gitignore`.
+- **Logs:** Framework execution and diagnostic information.
+- **Reports:** Extent HTML reports.
+- **Screenshots:** Failure evidence for applicable UI tests.
+- **Test output:** TestNG execution artifacts.
+- **Target:** Maven build output and compiled classes.
 
-This keeps the GitHub repository clean and prevents generated execution artifacts from being version-controlled.
+These generated artifacts should generally be excluded from Git using `.gitignore`, while configuration templates and useful documentation remain version-controlled.
 
 ---
 
-## 🔐 Test Data & Security
+## 🔐 Test Data and Security
 
-Credentials and environment-specific information should not be hardcoded directly into test classes.
+Follow these practices when configuring the framework:
 
-Sensitive information should preferably be provided through:
-
-* Environment variables
-* External configuration
-* Secure CI/CD secrets
-* Local configuration excluded from Git
-
-Do not commit real passwords, API keys, tokens, or other secrets to GitHub.
+- Do not hardcode real passwords, API tokens, or database credentials in test classes.
+- Do not commit secrets to GitHub.
+- Use environment variables or a secure CI/CD secrets store for sensitive settings.
+- Keep local credentials and machine-specific configuration out of version control.
+- Avoid logging passwords, access tokens, or other sensitive request values.
+- Use dedicated test data and clean up database records created by tests.
 
 ---
 
 ## 📈 Future Enhancements
 
-Potential improvements planned for future versions include:
+Potential enhancements, depending on project requirements, include:
 
-* CI/CD integration
-* Docker-based execution
-* Selenium Grid / cloud execution
-* Advanced parallel execution
-* Environment-specific configuration
-* Better test-data abstraction
-* API automation integration
-* Database validation utilities
-* AI-assisted test automation
-* Automatic failure analysis
-* Enhanced reporting dashboards
+- CI/CD integration with Jenkins or GitHub Actions.
+- Docker-based execution.
+- Selenium Grid or cloud browser execution.
+- Expanded API CRUD and negative testing coverage.
+- API schema validation and reusable response validation.
+- Stronger database test isolation and cleanup.
+- Environment-specific configuration profiles.
+- Improved parallel-execution validation.
+- AI-assisted failure analysis in a separate integration or module.
+- Enhanced reporting and execution dashboards.
+
+These are planned enhancements rather than claims that every capability is already implemented.
 
 ---
 
-## 🎯 Framework Goals
+## 🎯 Framework Design Principles
 
-The primary goals of this framework are:
+The framework emphasizes:
 
-```text
-Maintainability
-      +
-Reusability
-      +
-Scalability
-      +
-Readable Tests
-      +
-Centralized Reporting
-      +
-Thread-Safe Execution
-      +
-Clean Architecture
-```
-
-The framework is designed to demonstrate practical automation-engineering concepts rather than simply automate individual test cases.
+- **Single responsibility:** Each class has a clear role.
+- **Separation of concerns:** Test logic, UI workflows, API calls, database operations, and shared services are separated.
+- **Reusability:** Common functionality is centralized.
+- **Maintainability:** Changes to locators, configuration, API requests, or SQL operations can be isolated.
+- **Readable tests:** Test cases focus on scenarios and expected results.
+- **Centralized reporting:** Reporting lifecycle management is shared across test execution.
+- **Secure configuration:** Credentials are kept separate from source code.
+- **Practical scalability:** New pages, endpoints, database operations, and tests can be added without redesigning the entire project.
 
 ---
 
@@ -679,17 +688,12 @@ The framework is designed to demonstrate practical automation-engineering concep
 
 **Amol Sarode**
 
-Automation Engineer
+Automation Engineer | SDET
 
-### GitHub
-
-[https://github.com/amol-sarode](https://github.com/amol-sarode)
-
----
+GitHub: https://github.com/amol-sarode
 
 ## ⭐ Repository
 
-If you find this framework useful, consider giving the repository a star.
+https://github.com/amol-sarode/selenium-testng-framework
 
-**Repository:**
-[https://github.com/amol-sarode/selenium-testng-framework](https://github.com/amol-sarode/selenium-testng-framework)
+If you find this project useful, consider giving the repository a star.

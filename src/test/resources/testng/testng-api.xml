@@ -8,7 +8,7 @@
 
 	<test name="Booking API Tests">
 		<classes>
-			<class name="com.amol.automation.api.BookingTest" />
+			<class name="com.amol.automation.tests.api.BookingTest" />
 		</classes>
 	</test>
 </suite>
